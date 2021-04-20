@@ -13,7 +13,7 @@ $ python src/classify.py --test-file <TEST_FILE> --output-file <OUTPUT_FILE>
 ```
 
 replacing `<TEST_FILE>` with the path to a testing data file (
-e.g. `data/Semeval_2019_task9_data/Spanglish/Spanglish_test_conll_unlabeled.txt`)
+e.g. `data/Semeval_2020_task9_data/Spanglish/Spanglish_test_conll_unlabeled.txt`)
 and `<OUTPUT_FILE>` with the path to an output file (e.g. `output.txt`).
 
 ## Environment
