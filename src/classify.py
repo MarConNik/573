@@ -36,7 +36,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='classify records in a test set')
     parser.add_argument('--model-file', type=argparse.FileType('rb'),
                         help='path to saved model to use in classification')
-    parser.add_argument('--test-file', type=argparse.FileType('r'),
+    parser.add_argument('--test-file',
+                        type=argparse.FileType('r', encoding='latin-1'),
                         help='path to unlabelled testing data file')
     parser.add_argument('--output-file', type=argparse.FileType('w'),
                         help='path to output file')
