@@ -1,8 +1,12 @@
 import argparse
+import joblib
 import numpy as np
 import csv
-from sklearn.dummy import DummyClassifier
 
+
+'''E.g.:
+python src/classify.py --model-file model.joblib --test-file data/Semeval_2020_task9_data/Spanglish/Spanglish_test_conll_unlabeled.txt --output-file Spanglish_predictions.txt
+'''
 
 def load_test_data(test_file):
     # FIXME: This is kind of janky; ideally we could use a CONLL parser
@@ -47,8 +51,7 @@ if __name__ == '__main__':
     X_ids, X = load_test_data(args.test_file)
 
     # TODO: load real model from file
-    classifier = DummyClassifier(strategy='constant', constant='positive')
-    classifier.fit([''], ['positive'])
-    z = classifier.predict(X)
+    vectorizer, classifier = joblib.load(args.model_file)
+    z = classifier.predict(vectorizer.transform(X))
 
     output_predictions(X_ids, z, args.output_file)

@@ -1,48 +1,14 @@
 import argparse
 import joblib
-
-import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import SGDClassifier
+from utils import Preprocessor, Tokenizer, load_train_data
 
 
 '''
+E.g.:
 python src/train.py --train-file data/Semeval_2020_task9_data/Spanglish/Spanglish_train.conll --model-file model.joblib
 '''
-
-
-def load_train_data(training_file):
-    # FIXME: This is kind of janky; ideally we could use a CONLL parser
-    tweets = []
-    tweet_ids = []
-    sentiments = []
-    tweet = []
-    for line in training_file:
-        if line.strip() and line.split()[0] == 'meta' and not tweet:
-            _, tweet_id, sentiment = line.strip().split('\t')
-            tweet_ids.append(tweet_id)
-            sentiments.append(sentiment)
-        elif line.strip():
-            token, lang = tuple(line.strip().split('\t'))
-            tweet.append((token, lang))
-        elif tweet:
-            tweets.append(tuple(tweet))
-            tweet = []
-    if tweet:
-        tweets.append(tuple(tweet))
-    return np.array(tweet_ids), np.array(tweets), np.array(sentiments)
-
-
-def preprocess(token):
-    # TODO: Come up with preprocessing
-    return token
-
-
-def tokenize(sequence):
-    '''Take as input sequence [(token1, langtag1), (token2, langtag2), ...], output shallow sequence:
-    [token1, token2, ..., '', '', '', langtag1, langtag2, ...]
-    '''
-    return [token for token, language in sequence] + ([''] * 3) + [language for token, language in sequence]
 
 
 if __name__ == '__main__':
@@ -65,8 +31,8 @@ if __name__ == '__main__':
     # Transform tweets into sparse vectors
     vectorizer = CountVectorizer(
         ngram_range=(1, 3),
-        tokenizer=tokenize,
-        preprocessor=preprocess
+        tokenizer=Tokenizer(),
+        preprocessor=Preprocessor()
     )
     train_vectors = vectorizer.fit_transform(train_tweets)
 
