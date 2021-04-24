@@ -1,8 +1,12 @@
 import argparse
+import joblib
 import numpy as np
 import csv
-from sklearn.dummy import DummyClassifier
 
+
+'''E.g.:
+python src/classify.py --model-file model.joblib --test-file data/Semeval_2020_task9_data/Spanglish/Spanglish_test_conll_unlabeled.txt --output-file Spanglish_predictions.txt
+'''
 
 def load_test_data(test_file):
     # FIXME: This is kind of janky; ideally we could use a CONLL parser
@@ -23,12 +27,14 @@ def load_test_data(test_file):
 
 
 def output_predictions(X_ids, z, output_file):
-    output_csv = csv.writer(output_file, quoting=csv.QUOTE_MINIMAL)
-    output_csv.writerow(['Uid', 'Sentiment'])
-    for i in range(len(X_ids)):
-        X_id = X_ids[i]
-        guess = z[i]
-        output_csv.writerow([X_id, guess])
+    filename = output_file.name
+    with open(filename, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(['Uid', 'Sentiment'])
+        for i in range(len(X_ids)):
+            X_id = X_ids[i].replace('\n','').replace('\r','')
+            guess = z[i].replace('\n','').replace('\r','')
+            writer.writerow([X_id, guess])
 
 
 if __name__ == '__main__':
@@ -47,8 +53,7 @@ if __name__ == '__main__':
     X_ids, X = load_test_data(args.test_file)
 
     # TODO: load real model from file
-    classifier = DummyClassifier(strategy='constant', constant='positive')
-    classifier.fit([''], ['positive'])
-    z = classifier.predict(X)
+    vectorizer, classifier = joblib.load(args.model_file)
+    z = classifier.predict(vectorizer.transform(X))
 
     output_predictions(X_ids, z, args.output_file)
