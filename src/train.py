@@ -33,6 +33,18 @@ def load_train_data(training_file):
     return np.array(tweet_ids), np.array(tweets), np.array(sentiments)
 
 
+def preprocess(token):
+    # TODO: Come up with preprocessing
+    return token
+
+
+def tokenize(sequence):
+    '''Take as input sequence [(token1, langtag1), (token2, langtag2), ...], output shallow sequence:
+    [token1, token2, ..., '', '', '', langtag1, langtag2, ...]
+    '''
+    return [token for token, language in sequence] + ([''] * 3) + [language for token, language in sequence]
+
+
 if __name__ == '__main__':
     # Parser arguments:
     parser = argparse.ArgumentParser(description='classify records in a test set')
@@ -53,8 +65,8 @@ if __name__ == '__main__':
     # Transform tweets into sparse vectors
     vectorizer = CountVectorizer(
         ngram_range=(1, 3),
-        tokenizer=lambda sequence: [token for token, language in sequence] + ([''] * 3) + [language for token, language in sequence],
-        preprocessor=lambda token: token
+        tokenizer=tokenize,
+        preprocessor=preprocess
     )
     train_vectors = vectorizer.fit_transform(train_tweets)
 
