@@ -3,18 +3,30 @@ Collaborators: Connor Boyle, Martin Horst, Nikitas Tampakis
 
 The [shared document report](https://www.overleaf.com/project/60666a8f489d2af234461f37) is hosted on Overleaf.
 
-## Classifier
+## Training
 
-The classifier can be run from the command line (after activating the [correct
-environment](#environment)) with the following command:
+You can train a model (and vectorizer) using the following command (after activating the [correct
+environment](#environment)):
 
 ```shell
-$ python src/classify.py --test-file <TEST_FILE> --output-file <OUTPUT_FILE>
+$ python src/train.py --train-file <TRAIN_FILE> --model-file <MODEL_FILE>
+```
+
+replacing `<TRAIN_FILE>` with the path to training data and `<MODEL_FILE>`
+with a path to save the model (and vectorizer).
+
+## Classifier
+
+The classifier can be run from the shell with the following command:
+
+```shell
+$ python src/classify.py --test-file <TEST_FILE> --model-file <MODEL_FILE> --output-file <OUTPUT_FILE>
 ```
 
 replacing `<TEST_FILE>` with the path to a testing data file (
 e.g. `data/Semeval_2020_task9_data/Spanglish/Spanglish_test_conll_unlabeled.txt`)
-and `<OUTPUT_FILE>` with the path to an output file (e.g. `output.txt`).
+and `<OUTPUT_FILE>` with the path to an output file (e.g. `output.txt`) and
+`<MODEL_FILE>` with the path to a saved model file.
 
 ## Environment
 
