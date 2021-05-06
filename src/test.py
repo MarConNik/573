@@ -18,10 +18,12 @@ def test_dataloaders():
 
     for batch in training_dataloader:
         # Assert first batch is a full batch of correct length:
-        assert batch.value.shape[0] == BATCH_SIZE
+        input_ids, attention_masks, labels = batch
+        assert input_ids.shape[0] == BATCH_SIZE
         break
 
     for batch in validation_dataloader:
         # Assert first batch is a full batch of correct length:
-        assert batch.value.shape[0] == BATCH_SIZE
+        input_ids, attention_masks, labels = batch
+        assert attention_masks.shape[0] == BATCH_SIZE
         break
