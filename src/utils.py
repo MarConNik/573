@@ -25,7 +25,7 @@ class Tokenizer:
         return [token for token, language in sequence] + ([''] * 3) + [language for token, language in sequence]
 
 
-def load_train_data(training_file):
+def load_train_data(training_file, bert=True):
     # FIXME: This is kind of janky; ideally we could use a CONLL parser
     tweets = []
     tweet_ids = []
@@ -37,13 +37,23 @@ def load_train_data(training_file):
             tweet_ids.append(tweet_id)
             sentiments.append(sentiment)
         elif line.strip():
-            token, lang = tuple(line.strip().split('\t'))
-            tweet.append((token, lang))
+            if len(line.strip().split('\t')) == 2:
+                token, lang = tuple(line.strip().split('\t'))
+                if bert:
+                    tweet.append(token)
+                else:
+                    tweet.append((token, lang))
         elif tweet:
-            tweets.append(tuple(tweet))
+            if bert:
+                tweets.append(' '.join(tweet))
+            else:
+                tweets.append(tuple(tweet))
             tweet = []
     if tweet:
-        tweets.append(tuple(tweet))
+        if bert:
+            tweets.append(' '.join(tweet))
+        else:
+            tweets.append(tuple(tweet))
     return np.array(tweet_ids), np.array(tweets), np.array(sentiments)
 
 
