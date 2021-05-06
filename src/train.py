@@ -2,7 +2,7 @@ import argparse
 import joblib
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import SGDClassifier
-from utils import Preprocessor, Tokenizer, load_train_data
+from src.utils import Preprocessor, Tokenizer, load_train_data
 
 
 '''
