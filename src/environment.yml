@@ -5,6 +5,7 @@ dependencies:
   - python=3.9
   - pip=21.0
   - numpy=1.19
+  - pytest=6.2.3
   - scipy=1.6
   - scikit-learn=0.24
   - pip:

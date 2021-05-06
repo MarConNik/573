@@ -46,6 +46,10 @@ def load_train_data(training_file):
     return np.array(tweet_ids), np.array(tweets), np.array(sentiments)
 
 
+def encode_strings(tweets, sentiments):
+    raise NotImplementedError
+
+
 def get_dataloaders(input_ids, attention_masks, sentiment_labels, batch_size: int, train_share=DEFAULT_TRAIN_SHARE):
     # Split dataset into training and validation subsets
     dataset = TensorDataset(input_ids, attention_masks, sentiment_labels)
