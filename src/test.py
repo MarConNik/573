@@ -1,12 +1,13 @@
 import pytest
-from utils import get_dataloaders, load_train_data, encode_strings
+from src.utils import get_dataloaders, load_train_data, encode_strings
 
 
 BATCH_SIZE = 32
 
 
 def test_dataloaders():
-    tweet_ids, tweets, sentiment_labels = load_train_data('data/Semeval_2020_task9_data/Spanglish/Spanglish_train.conll')
+    with open('data/Semeval_2020_task9_data/Spanglish/Spanglish_train.conll', 'r', encoding='latin-1') as training_file:
+        tweet_ids, tweets, sentiment_labels = load_train_data(training_file)
     input_ids, attention_masks, sentiment_labels = encode_strings(tweets, sentiment_labels)
     training_dataloader, validation_dataloader = get_dataloaders(
         input_ids=input_ids,
