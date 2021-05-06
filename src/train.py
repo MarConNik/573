@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     # Get training tweets from file
     train_ids, train_tweets, train_sentiments = \
-        load_train_data(args.train_file)
+        load_train_data(args.train_file, False)
 
     # Transform tweets into sparse vectors
     vectorizer = CountVectorizer(
