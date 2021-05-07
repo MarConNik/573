@@ -4,6 +4,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import SGDClassifier
 from src.utils import Preprocessor, Tokenizer, load_train_data
 from transformers.models.bert.modeling_bert import BertPreTrainedModel
+from torch.utils.data import DataLoader
 
 
 '''
@@ -12,7 +13,7 @@ python src/train.py --train-file data/Semeval_2020_task9_data/Spanglish/Spanglis
 '''
 
 
-def train_model(training_dataloader, validation_dataloader) -> BertPreTrainedModel:
+def train_model(training_dataloader: DataLoader, validation_dataloader: DataLoader) -> BertPreTrainedModel:
     raise NotImplementedError()
 
 
