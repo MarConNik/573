@@ -2,8 +2,10 @@ import argparse
 import joblib
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import SGDClassifier
-from src.utils import Preprocessor, Tokenizer, load_train_data
-from transformers.models.bert.modeling_bert import BertPreTrainedModel
+from transformers import AdamW
+
+from src.utils import Preprocessor, Tokenizer, load_train_data, BERT_MODEL_NAME
+from transformers.models.bert.modeling_bert import BertPreTrainedModel, BertForSequenceClassification
 from torch.utils.data import DataLoader
 
 
@@ -13,8 +15,38 @@ python src/train.py --train-file data/Semeval_2020_task9_data/Spanglish/Spanglis
 '''
 
 
-def train_model(training_dataloader: DataLoader, validation_dataloader: DataLoader) -> BertPreTrainedModel:
-    raise NotImplementedError()
+# Default training hyperparameters
+DEFAULT_LEARNING_RATE = 2e-5
+DEFAULT_EPSILON = 1e-8
+
+
+def train_model(
+    training_dataloader: DataLoader,
+    validation_dataloader: DataLoader,
+    learning_rate: float = DEFAULT_LEARNING_RATE,
+    epsilon: float = DEFAULT_EPSILON,
+    num_labels: int
+) -> BertPreTrainedModel:
+    model: BertPreTrainedModel = BertForSequenceClassification.from_pretrained(
+        BERT_MODEL_NAME,  # Use the 12-layer BERT model, with an uncased vocab.
+        num_labels=num_labels,  # The number of output labels; -, 0, + for sentiment
+        # You can increase this for multi-class tasks.
+        output_attentions=False,  # Whether the model returns attentions weights.
+        output_hidden_states=False,  # Whether the model returns all hidden-states.
+    )
+
+    # FIXME: Make sure your computer can run GPU
+    # FIXME: Also, I (Connor) am pretty sure that since I have an AMD GPU, I have to activate something other than CUDA
+    model.cuda()
+
+    # FIXME: The tutorial that we are following says to use the HuggingFace/Transformers version; there is a PyTorch
+    #  version now, though.
+    optimizer = AdamW(
+        model.parameters(),
+        lr=learning_rate,
+        eps=epsilon
+    )
+
 
 
 if __name__ == '__main__':

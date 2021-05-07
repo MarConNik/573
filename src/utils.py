@@ -5,7 +5,8 @@ from transformers import BertTokenizer
 
 
 DEFAULT_TRAIN_SHARE = 0.90
-tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
+BERT_MODEL_NAME = 'bert-base-multilingual-cased'
+tokenizer = BertTokenizer.from_pretrained(BERT_MODEL_NAME)
 
 
 class Preprocessor:
