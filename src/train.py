@@ -3,12 +3,17 @@ import joblib
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import SGDClassifier
 from src.utils import Preprocessor, Tokenizer, load_train_data
+from transformers.models.bert.modeling_bert import BertPreTrainedModel
 
 
 '''
 E.g.:
 python src/train.py --train-file data/Semeval_2020_task9_data/Spanglish/Spanglish_train.conll --model-file model.joblib
 '''
+
+
+def train_model(training_dataloader, validation_dataloader) -> BertPreTrainedModel:
+    raise NotImplementedError()
 
 
 if __name__ == '__main__':
