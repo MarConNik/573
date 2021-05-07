@@ -18,12 +18,12 @@ with a path to save the model (and vectorizer).
 ## Data
 
 We will fill this out with more as we see fit
-Max tweet length of Spanglish_train.conll: 40
-Max tweet length of Spanglish_dev.conll: 42
-Max tweet length of Spanglish_test_conll_unlabeled.txt: 40
-Max tweet length of Hinglish_train_14k_split_conll.txt: 56
-Max tweet length of Hinglish_dev_3k_split_conll.txt: 44
-Max tweet length of Hinglish_test_unlabeled_conll_updated.txt: 41
+Max tweet length of Spanglish_train.conll: 73
+Max tweet length of Spanglish_dev.conll: 69
+Max tweet length of Spanglish_test_conll_unlabeled.txt: 117
+Max tweet length of Hinglish_train_14k_split_conll.txt: 82
+Max tweet length of Hinglish_dev_3k_split_conll.txt: 79
+Max tweet length of Hinglish_test_unlabeled_conll_updated.txt: 127
 
 ## Classifier
 
