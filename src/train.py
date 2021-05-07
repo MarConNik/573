@@ -2,7 +2,7 @@ import argparse
 import joblib
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import SGDClassifier
-from transformers import AdamW
+from transformers import AdamW, get_linear_schedule_with_warmup
 
 from src.utils import Preprocessor, Tokenizer, load_train_data, BERT_MODEL_NAME
 from transformers.models.bert.modeling_bert import BertPreTrainedModel, BertForSequenceClassification
@@ -18,6 +18,7 @@ python src/train.py --train-file data/Semeval_2020_task9_data/Spanglish/Spanglis
 # Default training hyperparameters
 DEFAULT_LEARNING_RATE = 2e-5
 DEFAULT_EPSILON = 1e-8
+DEFAULT_NUM_EPOCHS = 4
 
 
 def train_model(
@@ -25,6 +26,7 @@ def train_model(
     validation_dataloader: DataLoader,
     learning_rate: float = DEFAULT_LEARNING_RATE,
     epsilon: float = DEFAULT_EPSILON,
+    num_epochs: int = DEFAULT_NUM_EPOCHS,
     num_labels: int
 ) -> BertPreTrainedModel:
     model: BertPreTrainedModel = BertForSequenceClassification.from_pretrained(
@@ -46,6 +48,14 @@ def train_model(
         lr=learning_rate,
         eps=epsilon
     )
+
+    training_steps = len(training_dataloader) * num_epochs
+    scheduler = get_linear_schedule_with_warmup(
+        optimizer,
+        num_warmup_steps=0,  # FIXME: Why run with warmup if we set warmup steps to 0?
+        num_training_steps=training_steps
+    )
+
 
 
 
