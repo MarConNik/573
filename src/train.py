@@ -215,7 +215,7 @@ if __name__ == '__main__':
     model = train_model(training_dataloader, validation_dataloader, num_labels)
 
     # Save model to joblib
-    save_model(model, args.model_directory)
+    save_model(model, args.model_directory, 'FINAL')
 
     # Run model on test data
     # dev_ids, dev_tweets, dev_sentiments = load_train_data(args.dev_file)
