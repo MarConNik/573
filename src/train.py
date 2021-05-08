@@ -198,7 +198,8 @@ if __name__ == '__main__':
 
     # Count number of unique labels
     # FIXME: figure out a good way to make this no longer necessary
-    num_labels = len(set(sentiment_labels))
+    num_labels = len(torch.unique(sentiment_labels))
+    print(f"Number of unique labels: {num_labels}")
 
     # Train model
     model = train_model(training_dataloader, validation_dataloader, num_labels)
