@@ -2,14 +2,11 @@ import argparse
 import random
 import time
 
-import joblib
 import numpy as np
 import torch
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.linear_model import SGDClassifier
 from transformers import AdamW, get_linear_schedule_with_warmup
 
-from src.utils import Preprocessor, Tokenizer, load_train_data, BERT_MODEL_NAME
+from utils import load_train_data, BERT_MODEL_NAME, encode_strings, get_dataloaders
 from transformers.models.bert.modeling_bert import BertPreTrainedModel, BertForSequenceClassification
 from torch.utils.data import DataLoader
 
@@ -26,6 +23,7 @@ DEFAULT_EPSILON = 1e-8
 DEFAULT_NUM_EPOCHS = 4
 
 DEFAULT_SEED = 634  # Generated pseudorandomly (out of 1000)
+DEFAULT_BATCH_SIZE = 32
 
 
 def log(message):
@@ -35,10 +33,10 @@ def log(message):
 def train_model(
     training_dataloader: DataLoader,
     validation_dataloader: DataLoader,
+    num_labels: int,
     learning_rate: float = DEFAULT_LEARNING_RATE,
     epsilon: float = DEFAULT_EPSILON,
-    num_epochs: int = DEFAULT_NUM_EPOCHS,
-    num_labels: int
+    num_epochs: int = DEFAULT_NUM_EPOCHS
 ) -> BertPreTrainedModel:
     model: BertForSequenceClassification = BertForSequenceClassification.from_pretrained(
         BERT_MODEL_NAME,  # Use the 12-layer BERT model, with an uncased vocab.
@@ -53,12 +51,9 @@ def train_model(
     if torch.cuda.is_available():
         # Tell PyTorch to use the GPU.
         device = torch.device("cuda")
+        model.cuda()
     else:
         device = torch.device("cpu")
-
-    # FIXME: Make sure your computer can run GPU
-    # FIXME: Also, I (Connor) am pretty sure that since I have an AMD GPU, I have to activate something other than CUDA
-    model.cuda()
 
     # FIXME: The tutorial that we are following says to use the HuggingFace/Transformers version; there is a PyTorch
     #  version now, though.
@@ -108,7 +103,7 @@ def train_model(
 
         # Do once-through of training data per epoch
         # TODO: Track training and evaluation losses
-        for batch in training_dataloader:
+        for step, batch in enumerate(training_dataloader):
             batch_input_ids = batch[0].to(device)
             batch_attention_masks = batch[1].to(device)
             batch_sentiment_labels = batch[2].to(device)
@@ -125,6 +120,8 @@ def train_model(
             )
             batch_loss = result.loss
             batch_logits = result.logits
+
+            log(f"Training loss of batch {step} of epoch {epoch}: {batch_loss.item()}")
 
             # Backpropagate the loss
             batch_loss.backward()
@@ -149,7 +146,7 @@ def train_model(
         # Switch model to evaluation mode (store no gradients):
         model.eval()
 
-        for batch in validation_dataloader:
+        for step, batch in enumerate(validation_dataloader):
             batch_input_ids = batch[0].to(device)
             batch_attention_masks = batch[1].to(device)
             batch_sentiment_labels = batch[2].to(device)
@@ -163,11 +160,12 @@ def train_model(
                     return_dict=True
                 )
 
-                batch_loss = result.loss
-                batch_logits = result.logits
+            batch_loss = result.loss
+            batch_logits = result.logits
 
+            log(f"Validation loss of batch {step}, epoch {epoch}: {batch_loss.item()}")
 
-
+    return model
 
 
 if __name__ == '__main__':
@@ -181,26 +179,32 @@ if __name__ == '__main__':
     parser.add_argument('--dev-file',
                         type=argparse.FileType('r', encoding='latin-1'),
                         help='path to unlabelled testing data file')
+    parser.add_argument('--batch-size', type=int,
+                        default=DEFAULT_BATCH_SIZE,
+                        help='training (and validation) batch size')
     args = parser.parse_args()
 
     # Get training tweets from file
-    train_ids, train_tweets, train_sentiments = \
-        load_train_data(args.train_file, False)
+    tweet_ids, tweets, sentiment_labels = load_train_data(args.train_file, bert=True)
 
-    # Transform tweets into sparse vectors
-    vectorizer = CountVectorizer(
-        ngram_range=(1, 3),
-        tokenizer=Tokenizer(),
-        preprocessor=Preprocessor()
+    # Convert tweets to BERT-readable format
+    input_ids, attention_masks, sentiment_labels = encode_strings(tweets, sentiment_labels)
+    training_dataloader, validation_dataloader = get_dataloaders(
+        input_ids=input_ids,
+        attention_masks=attention_masks,
+        sentiment_labels=sentiment_labels,
+        batch_size=args.batch_size
     )
-    train_vectors = vectorizer.fit_transform(train_tweets)
+
+    # Count number of unique labels
+    # FIXME: figure out a good way to make this no longer necessary
+    num_labels = len(set(sentiment_labels))
 
     # Train model
-    model = SGDClassifier()
-    model.fit(train_vectors, train_sentiments)
+    model = train_model(training_dataloader, validation_dataloader, num_labels)
 
     # Save model to joblib
-    joblib.dump((vectorizer, model), args.model_file)
+    # joblib.dump((vectorizer, model), args.model_file)
 
     # Run model on test data
     # dev_ids, dev_tweets, dev_sentiments = load_train_data(args.dev_file)

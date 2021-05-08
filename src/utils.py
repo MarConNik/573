@@ -74,7 +74,7 @@ def encode_strings(strings, labels):
         encoded_dict = tokenizer.encode_plus(
             s,  # Sentence to encode.
             add_special_tokens=True,  # Add '[CLS]' and '[SEP]'
-            max_length=64,  # Pad & truncate all sentences.
+            max_length=140,  # Pad & truncate all sentences.
             truncation=True,
             padding='max_length',
             return_attention_mask=True,  # Construct attn. masks.

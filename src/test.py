@@ -1,5 +1,5 @@
 import pytest
-from src.utils import get_dataloaders, load_train_data, encode_strings
+from utils import get_dataloaders, load_train_data, encode_strings
 
 
 BATCH_SIZE = 32
