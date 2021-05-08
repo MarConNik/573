@@ -15,6 +15,18 @@ $ python src/train.py --train-file <TRAIN_FILE> --model-file <MODEL_FILE>
 replacing `<TRAIN_FILE>` with the path to training data and `<MODEL_FILE>`
 with a path to save the model (and vectorizer).
 
+## Data
+
+These represent the maximum tokenized tweet lengths from the BERT tokenizer
+for our train, dev, and test files for Spanglish and Hinglish. 
+E.G.: r, ##t, @, fra, ##lal, ##icio, ##ux, ##xe, t, ##bh, i, have, bad, sides, too, ., when, i, say, bad, it, ', s, ho, ##rri, ##bly, bad, .
+Spanglish_train.conll: 73
+Spanglish_dev.conll: 69
+Spanglish_test_conll_unlabeled.txt: 117
+Hinglish_train_14k_split_conll.txt: 82
+Hinglish_dev_3k_split_conll.txt: 79
+Hinglish_test_unlabeled_conll_updated.txt: 127
+
 ## Classifier
 
 The classifier can be run from the shell with the following command:
