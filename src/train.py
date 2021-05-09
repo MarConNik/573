@@ -1,4 +1,5 @@
 import argparse
+import os
 import random
 import time
 
@@ -168,10 +169,19 @@ def train_model(
     return model
 
 
+def save_model(model: BertPreTrainedModel, directory, name='X'):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    log(f"Saving model '{name}' to {directory}")
+
+    model.save_pretrained(directory)
+
+
 if __name__ == '__main__':
     # Parser arguments:
     parser = argparse.ArgumentParser(description='classify records in a test set')
-    parser.add_argument('--model-file', type=argparse.FileType('wb'),
+    parser.add_argument('--model-directory', '--model-dir', type=str,
                         help='path to save model to')
     parser.add_argument('--train-file',
                         type=argparse.FileType('r', encoding='latin-1'),
@@ -205,7 +215,7 @@ if __name__ == '__main__':
     model = train_model(training_dataloader, validation_dataloader, num_labels)
 
     # Save model to joblib
-    # joblib.dump((vectorizer, model), args.model_file)
+    save_model(model, args.model_directory, 'FINAL')
 
     # Run model on test data
     # dev_ids, dev_tweets, dev_sentiments = load_train_data(args.dev_file)
