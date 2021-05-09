@@ -37,7 +37,8 @@ def train_model(
     num_labels: int,
     learning_rate: float = DEFAULT_LEARNING_RATE,
     epsilon: float = DEFAULT_EPSILON,
-    num_epochs: int = DEFAULT_NUM_EPOCHS
+    num_epochs: int = DEFAULT_NUM_EPOCHS,
+    model_directory: str = None
 ) -> BertPreTrainedModel:
     model: BertForSequenceClassification = BertForSequenceClassification.from_pretrained(
         BERT_MODEL_NAME,  # Use the 12-layer BERT model, with an uncased vocab.
@@ -97,6 +98,10 @@ def train_model(
 
     training_start = time.time()
     for epoch in range(num_epochs):
+        # Save a model copy at the start of every epoch (only if directory is specified)
+        if model_directory:
+            save_model(model, model_directory, str(epoch))
+
         epoch_start = time.time()
 
         # Set model to train mode (this does NOT train the model)
@@ -169,13 +174,16 @@ def train_model(
     return model
 
 
-def save_model(model: BertPreTrainedModel, directory, name='X'):
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+def save_model(model: BertPreTrainedModel, model_directory: str, name: str):
+    """ Save model to `model_directory/name`
+    """
+    instance_directory = os.path.join(model_directory, name)
+    if not os.path.exists(instance_directory):
+        os.makedirs(instance_directory)
 
-    log(f"Saving model '{name}' to {directory}")
+    log(f"Saving model '{name}' to {model_directory}")
 
-    model.save_pretrained(directory)
+    model.save_pretrained(instance_directory)
 
 
 if __name__ == '__main__':
@@ -212,9 +220,9 @@ if __name__ == '__main__':
     print(f"Number of unique labels: {num_labels}")
 
     # Train model
-    model = train_model(training_dataloader, validation_dataloader, num_labels)
+    model = train_model(training_dataloader, validation_dataloader, num_labels, model_directory=args.model_directory)
 
-    # Save model to joblib
+    # Save final model
     save_model(model, args.model_directory, 'FINAL')
 
     # Run model on test data
