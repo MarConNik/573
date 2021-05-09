@@ -79,6 +79,10 @@ if __name__ == '__main__':
                         help='training (and validation) batch size')
     args = parser.parse_args()
 
+    # Load the model
+    model = BertForSequenceClassification.from_pretrained(args.model_directory)
+    model.eval()
+
     # Use CUDA if it's available (ie on Google Colab)
     if torch.cuda.is_available():
         # Tell PyTorch to use the GPU.
@@ -99,9 +103,6 @@ if __name__ == '__main__':
     # z = classifier.predict(vectorizer.transform(X))
 
     predictions = []
-    model = BertForSequenceClassification.from_pretrained(args.model_directory)
-    model.eval()
-
     for batch in prediction_dataset:
         # Add batch to GPU
         batch = tuple(t.to(device) for t in batch)
