@@ -7,11 +7,13 @@ import numpy as np
 import torch
 from tqdm import tqdm
 from transformers import AdamW, get_linear_schedule_with_warmup
+from pandas import DataFrame
 
 from utils import load_train_data, BERT_MODEL_NAME, encode_strings, get_dataloaders
 from transformers.models.bert.modeling_bert import BertPreTrainedModel, BertForSequenceClassification
 from torch.utils.data import DataLoader
 
+FINAL = 'FINAL'
 
 '''
 E.g.:
@@ -28,8 +30,20 @@ DEFAULT_SEED = 634  # Generated pseudorandomly (out of 1000)
 DEFAULT_BATCH_SIZE = 32
 
 
-def log(message):
-    print(message)
+class StatsLogger:
+    def __init__(self, num_epochs, fields=['Training Loss', 'Validation Loss']):
+        self.stats = DataFrame(columns=fields, index=list(range(num_epochs))+[FINAL])
+        self.stats.index.name = 'Epochs'
+
+    def log(self, field, epoch, value, should_print=True):
+        if should_print:
+            message = f"{field} for epoch #{epoch}: {value}"
+            print(message)
+
+        self.stats.loc[epoch, field] = value
+
+    def save(self, directory, filename='stats.csv'):
+        self.stats.to_csv(os.path.join(directory, filename))
 
 
 def train_model(
@@ -50,7 +64,6 @@ def train_model(
     )
 
     # Use CUDA if it's available
-    # FIXME: Connor's PC has an AMD GPU, which doesn't use CUDA
     if torch.cuda.is_available():
         # Tell PyTorch to use the GPU.
         device = torch.device("cuda")
@@ -97,6 +110,9 @@ def train_model(
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)  # FIXME: Change from CUDA if you're using a different GPU architecture
 
+    # Initialize object to keep track of training steps
+    stats_logger = StatsLogger(num_epochs=num_epochs)
+
     training_start = time.time()
     for epoch in range(num_epochs):
         # Save a model copy at the start of every epoch (only if directory is specified)
@@ -127,7 +143,7 @@ def train_model(
                 return_dict=True
             )
             batch_loss = result.loss
-            total_training_loss += batch_loss
+            total_training_loss += batch_loss.detach().numpy()
 
             # Backpropagate the loss
             batch_loss.backward()
@@ -144,10 +160,9 @@ def train_model(
             scheduler.step()
 
         mean_training_loss = total_training_loss / len(training_dataloader)
-        log(f"Training loss in epoch #{epoch}:  {mean_training_loss}")
+        stats_logger.log('Training Loss', epoch, mean_training_loss)
 
         # Do evaluation once per epoch
-        # TODO: Finish evaluation part of training loop
         # Switch model to evaluation mode (store no gradients):
         model.eval()
 
@@ -167,12 +182,13 @@ def train_model(
                 )
 
             batch_loss = result.loss
-            total_validation_loss += batch_loss
+            total_validation_loss += batch_loss.detach().numpy()
 
         mean_validation_loss = total_validation_loss / len(validation_dataloader)
-        log(f"Validation loss in epoch #{epoch}:  {mean_validation_loss}\n\n")
+        stats_logger.log('Validation Loss', epoch, mean_validation_loss)
 
-    return model
+    save_model(model, args.model_directory, FINAL)
+    stats_logger.save(model_directory)
 
 
 def save_model(model: BertPreTrainedModel, model_directory: str, name: str):
@@ -182,7 +198,7 @@ def save_model(model: BertPreTrainedModel, model_directory: str, name: str):
     if not os.path.exists(instance_directory):
         os.makedirs(instance_directory)
 
-    log(f"Saving model '{name}' to {model_directory}")
+    print(f"\nSaving model '{name}' to {model_directory}")
 
     model.save_pretrained(instance_directory)
 
@@ -220,13 +236,5 @@ if __name__ == '__main__':
     num_labels = len(torch.unique(sentiment_labels))
     print(f"Number of unique labels: {num_labels}")
 
-    # Train model
-    model = train_model(training_dataloader, validation_dataloader, num_labels, model_directory=args.model_directory)
-
-    # Save final model
-    save_model(model, args.model_directory, 'FINAL')
-
-    # Run model on test data
-    # dev_ids, dev_tweets, dev_sentiments = load_train_data(args.dev_file)
-    # dev_vectors = vectorizer.transform(dev_tweets)
-    # dev_predictions = model.predict(dev_vectors)
+    # Train & save model
+    train_model(training_dataloader, validation_dataloader, num_labels, model_directory=args.model_directory)
