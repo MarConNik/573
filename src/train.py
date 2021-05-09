@@ -98,23 +98,6 @@ def train_model(
         num_training_steps=training_steps
     )
 
-    """ Training loop steps (from McCormick blog post):
-        - Unpack our data inputs and labels
-        - Load data onto the GPU for acceleration
-        - Clear out the gradients calculated in the previous pass.
-        - In pytorch the gradients accumulate by default (useful for things like RNNs) unless you explicitly clear them out.
-        - Forward pass (feed input data through the network)
-        - Backward pass (backpropagation)
-        - Tell the network to update parameters with optimizer.step()
-        - Track variables for monitoring progress
-    
-    Evaluation steps:
-        - Unpack our data inputs and labels
-        - Load data onto the GPU for acceleration
-        - Forward pass (feed input data through the network)
-        - Compute loss on our validation data and track variables for monitoring progress
-    """
-
     # Set random seeds
     seed = DEFAULT_SEED
     random.seed(seed)
@@ -132,12 +115,13 @@ def train_model(
             'Epsilon': epsilon,
             'Epochs': num_epochs,
             'Learning Rate': learning_rate,
-            'Seed': seed,
+            'Random Seed': seed,
             'Training Batch Size': training_dataloader.batch_size,
             'Training Batch Count': len(training_dataloader),
             'Validation Batch Size': validation_dataloader.batch_size,
             'Validation Batch Count': len(validation_dataloader),
-            'Optimizer': 'AdamW'  # Change this if we switch to another optimizer
+            'Optimizer': 'AdamW',  # Change this if we switch to another optimizer
+            'Training Device': str(device)
         }
     )
 
