@@ -31,7 +31,9 @@ DEFAULT_BATCH_SIZE = 32
 
 
 class StatsLogger:
-    def __init__(self, num_epochs, fields=['Training Loss', 'Validation Loss']):
+    def __init__(self, num_epochs, fields=None):
+        if fields is None:
+            fields = ['Training Loss', 'Validation Loss']
         self.stats = DataFrame(columns=fields, index=list(range(num_epochs))+[FINAL])
         self.stats.index.name = 'Epochs'
 
@@ -44,6 +46,16 @@ class StatsLogger:
 
     def save(self, directory, filename='stats.csv'):
         self.stats.to_csv(os.path.join(directory, filename))
+
+
+def log_hyperparameters(hyperparameters: dict, directory, filename='hyperparameters.csv'):
+    df = DataFrame.from_records(
+        [{'Hyperparameter': key, 'Value': value} for key, value in hyperparameters.items()], index=['Hyperparameter'])
+
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    file_path = os.path.join(directory, filename)
+    df.to_csv(file_path)
 
 
 def train_model(
@@ -112,6 +124,22 @@ def train_model(
 
     # Initialize object to keep track of training steps
     stats_logger = StatsLogger(num_epochs=num_epochs)
+
+    # Log hyperparameters
+    log_hyperparameters(
+        directory=model_directory,
+        hyperparameters={
+            'Epsilon': epsilon,
+            'Epochs': num_epochs,
+            'Learning Rate': learning_rate,
+            'Seed': seed,
+            'Training Batch Size': training_dataloader.batch_size,
+            'Training Batch Count': len(training_dataloader),
+            'Validation Batch Size': validation_dataloader.batch_size,
+            'Validation Batch Count': len(validation_dataloader),
+            'Optimizer': 'AdamW'  # Change this if we switch to another optimizer
+        }
+    )
 
     training_start = time.time()
     for epoch in range(num_epochs):
@@ -187,7 +215,7 @@ def train_model(
         mean_validation_loss = total_validation_loss / len(validation_dataloader)
         stats_logger.log('Validation Loss', epoch, mean_validation_loss)
 
-    save_model(model, args.model_directory, FINAL)
+    save_model(model, model_directory, FINAL)
     stats_logger.save(model_directory)
 
 
