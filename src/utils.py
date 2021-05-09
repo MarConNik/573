@@ -5,6 +5,7 @@ from transformers import BertTokenizer
 
 
 DEFAULT_TRAIN_SHARE = 0.90
+MAX_TOKENIZED_TWEET_LENGTH = 140
 BERT_MODEL_NAME = 'bert-base-multilingual-cased'
 tokenizer = BertTokenizer.from_pretrained(BERT_MODEL_NAME)
 
@@ -74,7 +75,7 @@ def encode_strings(strings, labels):
         encoded_dict = tokenizer.encode_plus(
             s,  # Sentence to encode.
             add_special_tokens=True,  # Add '[CLS]' and '[SEP]'
-            max_length=140,  # Pad & truncate all sentences.
+            max_length=MAX_TOKENIZED_TWEET_LENGTH,  # Pad & truncate all sentences.
             truncation=True,
             padding='max_length',
             return_attention_mask=True,  # Construct attn. masks.
