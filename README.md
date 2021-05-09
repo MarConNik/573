@@ -9,11 +9,11 @@ You can train a model (and vectorizer) using the following command (after activa
 environment](#environment)):
 
 ```shell
-$ python src/train.py --train-file <TRAIN_FILE> --model-file <MODEL_FILE>
+$ python src/train.py --train-file <TRAIN_FILE> --model-directory <MODEL_DIRECTORY>
 ```
 
-replacing `<TRAIN_FILE>` with the path to training data and `<MODEL_FILE>`
-with a path to save the model (and vectorizer).
+replacing `<TRAIN_FILE>` with the path to training data and `<MODEL_DIRECTORY>`
+with a path to save the model.
 
 ## Data
 

@@ -14,7 +14,7 @@ from torch.utils.data import DataLoader
 
 '''
 E.g.:
-python src/train.py --train-file data/Semeval_2020_task9_data/Spanglish/Spanglish_train.conll --model-file model.joblib
+python src/train.py --train-file data/Semeval_2020_task9_data/Spanglish/Spanglish_train.conll --model-directory ./saved_model
 '''
 
 
