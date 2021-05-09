@@ -110,6 +110,7 @@ def train_model(
 
         # Do once-through of training data per epoch
         # (tqdm) makes a nice loading bar
+        total_training_loss = 0.0
         for step, batch in tqdm(enumerate(training_dataloader), total=len(training_dataloader)):
             batch_input_ids = batch[0].to(device)
             batch_attention_masks = batch[1].to(device)
@@ -126,7 +127,7 @@ def train_model(
                 return_dict=True
             )
             batch_loss = result.loss
-            batch_logits = result.logits
+            total_training_loss += batch_loss
 
             # Backpropagate the loss
             batch_loss.backward()
@@ -142,16 +143,16 @@ def train_model(
             # Update the learning rate based on step
             scheduler.step()
 
-        training_end = time.time()
-        epoch_train_minutes = (training_end - training_start) / 60
-        log(f"Total train time of epoch {epoch}: {epoch_train_minutes}")
+        mean_training_loss = total_training_loss / len(training_dataloader)
+        log(f"Training loss in epoch #{epoch}:  {mean_training_loss}")
 
         # Do evaluation once per epoch
         # TODO: Finish evaluation part of training loop
         # Switch model to evaluation mode (store no gradients):
         model.eval()
 
-        for step, batch in enumerate(validation_dataloader):
+        total_validation_loss = 0.0
+        for batch in tqdm(validation_dataloader):
             batch_input_ids = batch[0].to(device)
             batch_attention_masks = batch[1].to(device)
             batch_sentiment_labels = batch[2].to(device)
@@ -166,9 +167,10 @@ def train_model(
                 )
 
             batch_loss = result.loss
-            batch_logits = result.logits
+            total_validation_loss += batch_loss
 
-            log(f"Validation loss of batch {step}, epoch {epoch}: {batch_loss.item()}")
+        mean_validation_loss = total_validation_loss / len(validation_dataloader)
+        log(f"Validation loss in epoch #{epoch}:  {mean_validation_loss}\n\n")
 
     return model
 
