@@ -1,3 +1,5 @@
+from typing import List, Any
+
 import numpy as np
 import torch
 from torch.utils.data import random_split, TensorDataset, DataLoader, RandomSampler, SequentialSampler
@@ -31,7 +33,14 @@ class Tokenizer:
 
 
 def load_train_data(training_file, bert=True):
-    # FIXME: This is kind of janky; ideally we could use a CONLL parser
+    """ Takes a file object (not path string) for training_file
+
+    If bert:
+    returns (tweet_ids, tweets, sentiment_labels), where each tweet is a [(token, tag), (token, tag), (token, tag)] list
+
+    If not bert:
+    returns (tweet_ids, tweets, sentiment_labels), where each tweet is a string, with no language tags included.
+    """
     tweets = []
     tweet_ids = []
     sentiments = []
