@@ -11,3 +11,4 @@ dependencies:
   - pip:
     - torch==1.8.1
     - transformers==4.5.1
+    - tqdm==4.60
