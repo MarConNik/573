@@ -2,14 +2,28 @@ import argparse
 import joblib
 import numpy as np
 import csv
+from utils import encode_strings, INDEX_LABELS
+import torch
+from transformers import BertForSequenceClassification
+from torch.utils.data import TensorDataset, DataLoader, SequentialSampler
+
 
 
 '''E.g.:
-python src/classify.py --model-file model.joblib --test-file data/Semeval_2020_task9_data/Spanglish/Spanglish_test_conll_unlabeled.txt --output-file Spanglish_predictions.txt
+python src/classify.py --model-directory outputs/SpanglishModel-V0/ --test-file data/Semeval_2020_task9_data/Spanglish/Spanglish_test_conll_unlabeled.txt --output-file Spanglish_predictions.txt
 '''
 
-def load_test_data(test_file):
-    # FIXME: This is kind of janky; ideally we could use a CONLL parser
+DEFAULT_BATCH_SIZE = 32
+
+def load_test_data(test_file, bert=True):
+    """ Takes a file object (not path string) for training_file
+
+    If bert:
+    returns (tweet_ids, tweets), where each tweet is a [(token, tag), (token, tag), (token, tag)] list
+
+    If not bert:
+    returns (tweet_ids, tweets), where each tweet is a string, with no language tags included.
+    """
     tweets = []
     tweet_ids = []
     tweet = []
@@ -17,16 +31,29 @@ def load_test_data(test_file):
         if line.strip() and line.split()[0] == 'meta' and not tweet:
             tweet_ids.append(line.strip().split('\t')[1])
         elif line.strip():
-            tweet.append(tuple(line.strip().split('\t')))
+            if len(line.strip().split('\t')) == 2:
+                token, lang = tuple(line.strip().split('\t'))
+                if bert:
+                    tweet.append(token)
+                else:
+                    tweet.append((token, lang))
         elif tweet:
-            tweets.append(tuple(tweet))
+            if bert:
+                tweets.append(' '.join(tweet))
+            else:
+                tweets.append(tuple(tweet))
             tweet = []
     if tweet:
-        tweets.append(tuple(tweet))
+        if bert:
+            tweets.append(' '.join(tweet))
+        else:
+            tweets.append(tuple(tweet))
     return np.array(tweet_ids), np.array(tweets)
 
 
 def output_predictions(X_ids, z, output_file):
+    """ Takes a list of ids along with classified sentiments and writes to provided output filename.
+    """
     filename = output_file.name
     with open(filename, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
@@ -40,20 +67,55 @@ def output_predictions(X_ids, z, output_file):
 if __name__ == '__main__':
     # Parser arguments:
     parser = argparse.ArgumentParser(description='classify records in a test set')
-    parser.add_argument('--model-file', type=argparse.FileType('rb'),
+    parser.add_argument('--model-directory', '--model-dir', type=str,
                         help='path to saved model to use in classification')
     parser.add_argument('--test-file',
                         type=argparse.FileType('r', encoding='latin-1'),
                         help='path to unlabelled testing data file')
     parser.add_argument('--output-file', type=argparse.FileType('w'),
                         help='path to output file')
+    parser.add_argument('--batch-size', type=int,
+                        default=DEFAULT_BATCH_SIZE,
+                        help='training (and validation) batch size')
     args = parser.parse_args()
+
+    # Use CUDA if it's available (ie on Google Colab)
+    if torch.cuda.is_available():
+        # Tell PyTorch to use the GPU.
+        device = torch.device("cuda")
+        model.cuda()
+    else:
+        device = torch.device("cpu")
 
     # Load test data
     X_ids, X = load_test_data(args.test_file)
+    input_ids, attention_masks, _ = encode_strings(X, [])
+    dataset = TensorDataset(input_ids, attention_masks)
 
-    # TODO: load real model from file
-    vectorizer, classifier = joblib.load(args.model_file)
-    z = classifier.predict(vectorizer.transform(X))
+    prediction_dataset = DataLoader(dataset, batch_size = args.batch_size)
 
-    output_predictions(X_ids, z, args.output_file)
+    # From D2 classifier
+    # vectorizer, classifier = joblib.load(args.model_file)
+    # z = classifier.predict(vectorizer.transform(X))
+
+    predictions = []
+    model = BertForSequenceClassification.from_pretrained(args.model_directory)
+    model.eval()
+
+    for batch in prediction_dataset:
+        # Add batch to GPU
+        batch = tuple(t.to(device) for t in batch)
+
+        # Unpack the inputs from our dataloader
+        b_input_ids, b_input_mask = batch
+
+        # For some reason we have to globally disable gradient accumulation (in addition to setting model to `eval()`)
+        with torch.no_grad(): result = model(b_input_ids,
+                         token_type_ids=None,
+                         attention_mask=b_input_mask,
+                         return_dict=True)
+        batch_logits = result.logits
+        logits = batch_logits.detach().cpu().numpy()
+        predictions += [INDEX_LABELS[np.argmax(values)] for values in logits]
+
+    output_predictions(X_ids, predictions, args.output_file)
