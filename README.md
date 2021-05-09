@@ -42,32 +42,31 @@ and `<OUTPUT_FILE>` with the path to an output file (e.g. `output.txt`) and
 
 ## Environment
 
-We load and save our Python environment using Conda. You can **load** the
-environment for the **first time** by running the following command from the
-root of the repository:
+We load and save our base Python environment using Conda. You can **load** the environment for the **first time** by
+running the following command from the root of the repository:
 
 ```bash
 $ conda env create -f=src/environment.yml
 ```
 
-You can then **activate** the environment with the following command:
+You can then **activate** the base environment with the following command:
 
 ```bash
 $ conda activate 573
 ```
 
-To **update** your current environment with a new or changed `environment.yml`
+To **update** your current base environment with a new or changed `environment.yml`
 file, run the following command:
 
 ```bash
 $ conda env update -f=src/environment.yml
 ```
 
-If you have added or updated any new packages using `conda install`, **save**
-them to `environment.yml` using the following command:
+### Dependencies
+
+On top of the base environment, you will need to install package dependencies from `requirements.txt`
+(make sure you have activated the base environment you want to use):
 
 ```bash
-$ conda env export > src/environment.yml
+$ pip install -r src/requirements.txt
 ```
-
-then remove the line starting with `prefix:`.
