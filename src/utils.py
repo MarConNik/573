@@ -6,6 +6,11 @@ from torch.utils.data import random_split, TensorDataset, DataLoader, RandomSamp
 from transformers import BertTokenizer
 
 
+LABEL_INDICES = {
+    'negative': 0,
+    'neutral': 1,
+    'positive': 2
+}
 DEFAULT_TRAIN_SHARE = 0.90
 MAX_TOKENIZED_TWEET_LENGTH = 140
 BERT_MODEL_NAME = 'bert-base-multilingual-cased'
@@ -100,8 +105,7 @@ def encode_strings(strings, labels):
 
     # Convert label strings to integers
     all_labels = set(labels)
-    label_indices = {label_string: label_int for label_int, label_string in enumerate(all_labels)}
-    label_ints = np.array([label_indices[label] for label in labels])
+    label_ints = np.array([LABEL_INDICES[label] for label in labels])
     label_tensor = torch.tensor(label_ints)
     return input_ids, attention_masks, label_tensor
 
