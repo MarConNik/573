@@ -11,6 +11,7 @@ LABEL_INDICES = {
     'neutral': 1,
     'positive': 2
 }
+INDEX_LABELS = {value: key for key, value in LABEL_INDICES.items()}
 DEFAULT_TRAIN_SHARE = 0.90
 MAX_TOKENIZED_TWEET_LENGTH = 140
 BERT_MODEL_NAME = 'bert-base-multilingual-cased'
