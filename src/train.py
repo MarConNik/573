@@ -5,6 +5,7 @@ import time
 
 import numpy as np
 import torch
+from tqdm import tqdm
 from transformers import AdamW, get_linear_schedule_with_warmup
 
 from utils import load_train_data, BERT_MODEL_NAME, encode_strings, get_dataloaders
@@ -108,8 +109,8 @@ def train_model(
         model.train()
 
         # Do once-through of training data per epoch
-        # TODO: Track training and evaluation losses
-        for step, batch in enumerate(training_dataloader):
+        # (tqdm) makes a nice loading bar
+        for step, batch in tqdm(enumerate(training_dataloader), total=len(training_dataloader)):
             batch_input_ids = batch[0].to(device)
             batch_attention_masks = batch[1].to(device)
             batch_sentiment_labels = batch[2].to(device)
@@ -126,8 +127,6 @@ def train_model(
             )
             batch_loss = result.loss
             batch_logits = result.logits
-
-            log(f"Training loss of batch {step} of epoch {epoch}: {batch_loss.item()}")
 
             # Backpropagate the loss
             batch_loss.backward()
