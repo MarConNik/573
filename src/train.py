@@ -158,7 +158,7 @@ def train_model(
                 return_dict=True
             )
             batch_loss = result.loss
-            total_training_loss += batch_loss.detach().numpy()
+            total_training_loss += batch_loss.detach().cpu().numpy()
 
             # Backpropagate the loss
             batch_loss.backward()
@@ -197,7 +197,7 @@ def train_model(
                 )
 
             batch_loss = result.loss
-            total_validation_loss += batch_loss.detach().numpy()
+            total_validation_loss += batch_loss.detach().cpu().numpy()
 
         mean_validation_loss = total_validation_loss / len(validation_dataloader)
         stats_logger.log('Validation Loss', epoch, mean_validation_loss)
