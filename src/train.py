@@ -17,7 +17,7 @@ FINAL = 'FINAL'
 
 '''
 E.g.:
-python src/train.py --train-file data/Semeval_2020_task9_data/Spanglish/Spanglish_train.conll --model-directory ./saved_model
+python src/train.py --train-file data/Semeval_2020_task9_data/SpanglishMini/train100.conll --model-directory ./saved_model
 '''
 
 
@@ -62,9 +62,10 @@ def train_model(
     training_dataloader: DataLoader,
     validation_dataloader: DataLoader,
     num_labels: int,
-    learning_rate: float = DEFAULT_LEARNING_RATE,
-    epsilon: float = DEFAULT_EPSILON,
-    num_epochs: int = DEFAULT_NUM_EPOCHS,
+    num_epochs: int,
+    learning_rate: float,
+    random_seed: int,
+    epsilon: float,
     pretrained_model: str = BERT_MODEL_NAME,
     model_directory: str = None
 ) -> BertPreTrainedModel:
@@ -100,7 +101,7 @@ def train_model(
     )
 
     # Set random seeds
-    seed = DEFAULT_SEED
+    seed = args.random_seed
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -221,16 +222,15 @@ if __name__ == '__main__':
     # Parser arguments:
     parser = argparse.ArgumentParser(description='classify records in a test set')
     parser.add_argument('--model-directory', '--model-dir', type=str,
-                        help='path to save model to')
-    parser.add_argument('--train-file',
-                        type=argparse.FileType('r', encoding='latin-1'),
-                        help='path to unlabelled testing data file')
-    parser.add_argument('--dev-file',
-                        type=argparse.FileType('r', encoding='latin-1'),
-                        help='path to unlabelled testing data file')
-    parser.add_argument('--batch-size', type=int,
-                        default=DEFAULT_BATCH_SIZE,
+                        help='path to save model to', required=True)
+    parser.add_argument('--train-file', type=argparse.FileType('r', encoding='latin-1'),
+                        help='path to unlabelled testing data file', required=True)
+    parser.add_argument('--batch-size', type=int, default=DEFAULT_BATCH_SIZE,
                         help='training (and validation) batch size')
+    parser.add_argument('--epochs', '--num-epochs', type=int, default=DEFAULT_NUM_EPOCHS)
+    parser.add_argument('--learning-rate', '--lr', type=float, default=DEFAULT_LEARNING_RATE)
+    parser.add_argument('--random-seed', '--seed', type=int, default=DEFAULT_SEED)
+    parser.add_argument('--epsilon', type=float, default=DEFAULT_EPSILON)
     args = parser.parse_args()
 
     # Get training tweets from file
@@ -251,4 +251,13 @@ if __name__ == '__main__':
     print(f"Number of unique labels: {num_labels}")
 
     # Train & save model
-    train_model(training_dataloader, validation_dataloader, num_labels, model_directory=args.model_directory)
+    train_model(
+        training_dataloader=training_dataloader,
+        validation_dataloader=validation_dataloader,
+        num_labels=num_labels,
+        epsilon=args.epsilon,
+        learning_rate=args.learning_rate,
+        num_epochs=args.epochs,
+        random_seed=args.random_seed,
+        model_directory=args.model_directory
+    )
