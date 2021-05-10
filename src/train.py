@@ -65,10 +65,11 @@ def train_model(
     learning_rate: float = DEFAULT_LEARNING_RATE,
     epsilon: float = DEFAULT_EPSILON,
     num_epochs: int = DEFAULT_NUM_EPOCHS,
+    pretrained_model: str = BERT_MODEL_NAME,
     model_directory: str = None
 ) -> BertPreTrainedModel:
     model: BertForSequenceClassification = BertForSequenceClassification.from_pretrained(
-        BERT_MODEL_NAME,  # Use the 12-layer BERT model, with an uncased vocab.
+        pretrained_model,  # Use the 12-layer BERT model, with an uncased vocab.
         num_labels=num_labels,  # The number of output labels; -, 0, + for sentiment
         # You can increase this for multi-class tasks.
         output_attentions=False,  # Whether the model returns attentions weights.
@@ -121,7 +122,8 @@ def train_model(
             'Validation Batch Size': validation_dataloader.batch_size,
             'Validation Batch Count': len(validation_dataloader),
             'Optimizer': 'AdamW',  # Change this if we switch to another optimizer
-            'Training Device': str(device)
+            'Training Device': str(device),
+            'Pre-trained Model': pretrained_model
         }
     )
 
