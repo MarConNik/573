@@ -79,5 +79,3 @@ On top of the base environment, you will need to install package dependencies fr
 ```bash
 $ pip install -r src/requirements.txt
 ```
-
-
