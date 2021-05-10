@@ -3,6 +3,15 @@ Collaborators: Connor Boyle, Martin Horst, Nikitas Tampakis
 
 The [shared document report](https://www.overleaf.com/project/60666a8f489d2af234461f37) is hosted on Overleaf.
 
+### NOTE: Cached Models (D3)
+
+The cached Spanglish model for D3 is committed to this repository. It requires `git-lfs` to download the actual file; by
+default, cloning this repository will only download a metadata file of the PyTorch model
+file (`outputs/D3/Spanglish-ModelV3.2/pytorch_model.bin`) to your local environment. If you can't get `git-lfs` to
+download the full 700+ MB trained model, you can
+use [this link](https://drive.google.com/drive/folders/10U76ymJpjGbqNlExJ5PnelO5nb-45KCd?usp=sharing) to reach a copy of
+the same model file on our shared Google Drive.
+
 ## Training
 
 You can train a model (and vectorizer) using the following command (after activating the [correct
