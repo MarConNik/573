@@ -13,11 +13,11 @@
 echo "Using pretrained M-BERT model from dir here:" 
 echo "$1"
 echo "Now classifying testing instances using model.."
-#python src/classify.py --model-directory "$1" --test-file "$2" --output-file "$3"
+python src/classify.py --model-directory "$1" --test-file "$2" --output-file "$3"
 echo "Finished classifying testing instances."
 
 echo "Evaluate script running..."
-#python src/evaluate.py "$4" "$3" > "$5"
+python src/evaluate.py "$4" "$3" > "$5"
 echo "Finished evaluating."
 echo "Results available here:"
 echo "$3"
