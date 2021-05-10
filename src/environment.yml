@@ -4,12 +4,3 @@ channels:
 dependencies:
   - python=3.9
   - pip=21.0
-  - numpy=1.19
-  - pytest=6.2.3
-  - scipy=1.6
-  - scikit-learn=0.24
-  - pip:
-    - pandas=1.2.4
-    - torch==1.8.1
-    - transformers==4.5.1
-    - tqdm==4.60
