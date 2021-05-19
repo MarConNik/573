@@ -2,17 +2,16 @@ import argparse
 import os
 import random
 import time
-
 import numpy as np
 import torch
 from tqdm import tqdm
 from transformers import AdamW, get_linear_schedule_with_warmup
 from pandas import DataFrame
-
-from utils import BERT_MODEL_NAME, encode_strings, get_dataloaders
-from load import load_data
+from utils.bert import BERT_MODEL_NAME, encode_strings, get_dataloaders
+from utils.load import load_data
 from transformers.models.bert.modeling_bert import BertPreTrainedModel, BertForSequenceClassification
 from torch.utils.data import DataLoader
+
 
 FINAL = 'FINAL'
 

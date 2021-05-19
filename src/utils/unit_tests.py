@@ -1,6 +1,6 @@
-import pytest
-from src.utils import get_dataloaders, encode_strings
-from src.load import load_data
+from .bert import encode_strings, get_dataloaders
+from .load import load_data
+
 
 BATCH_SIZE = 32
 
