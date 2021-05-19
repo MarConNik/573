@@ -9,7 +9,8 @@ from tqdm import tqdm
 from transformers import AdamW, get_linear_schedule_with_warmup
 from pandas import DataFrame
 
-from utils import load_train_data, BERT_MODEL_NAME, encode_strings, get_dataloaders
+from utils import BERT_MODEL_NAME, encode_strings, get_dataloaders
+from load import load_data
 from transformers.models.bert.modeling_bert import BertPreTrainedModel, BertForSequenceClassification
 from torch.utils.data import DataLoader
 
@@ -234,7 +235,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Get training tweets from file
-    tweet_ids, tweets, sentiment_labels = load_train_data(args.train_file, bert=True)
+    tweet_ids, tweets, sentiment_labels = load_data(args.train_file)
 
     # Convert tweets to BERT-readable format
     input_ids, attention_masks, sentiment_labels = encode_strings(tweets, sentiment_labels)

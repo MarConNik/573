@@ -1,10 +1,9 @@
-from typing import List, Any
-
 import numpy as np
 import torch
 from torch.utils.data import random_split, TensorDataset, DataLoader, RandomSampler, SequentialSampler
 from transformers import BertTokenizer
 
+from preprocess import preprocess_tweet
 
 LABEL_INDICES = {
     'negative': 0,
@@ -18,66 +17,9 @@ BERT_MODEL_NAME = 'bert-base-multilingual-cased'
 tokenizer = BertTokenizer.from_pretrained(BERT_MODEL_NAME)
 
 
-class Preprocessor:
-    def __init__(self):
-        pass
-
-    def __call__(self, token):
-        # TODO: Come up with preprocessing
-        return token
-
-
-class Tokenizer:
-    def __init__(self):
-        pass
-
-    def __call__(self, sequence):
-        '''Take as input sequence [(token1, langtag1), (token2, langtag2), ...], output shallow sequence:
-        [token1, token2, ..., '', '', '', langtag1, langtag2, ...]
-        '''
-        return [token for token, language in sequence] + ([''] * 3) + [language for token, language in sequence]
-
-
-def load_train_data(training_file, bert=True):
-    """ Takes a file object (not path string) for training_file
-
-    If bert:
-    returns (tweet_ids, tweets, sentiment_labels), where each tweet is a [(token, tag), (token, tag), (token, tag)] list
-
-    If not bert:
-    returns (tweet_ids, tweets, sentiment_labels), where each tweet is a string, with no language tags included.
-    """
-    tweets = []
-    tweet_ids = []
-    sentiments = []
-    tweet = []
-    for line in training_file:
-        if line.strip() and line.split()[0] == 'meta' and not tweet:
-            _, tweet_id, sentiment = line.strip().split('\t')
-            tweet_ids.append(tweet_id)
-            sentiments.append(sentiment)
-        elif line.strip():
-            if len(line.strip().split('\t')) == 2:
-                token, lang = tuple(line.strip().split('\t'))
-                if bert:
-                    tweet.append(token)
-                else:
-                    tweet.append((token, lang))
-        elif tweet:
-            if bert:
-                tweets.append(' '.join(tweet))
-            else:
-                tweets.append(tuple(tweet))
-            tweet = []
-    if tweet:
-        if bert:
-            tweets.append(' '.join(tweet))
-        else:
-            tweets.append(tuple(tweet))
-    return np.array(tweet_ids), np.array(tweets), np.array(sentiments)
-
-
 def encode_strings(strings, labels):
+    '''Preprocess tweet strings; tokenize with BERT tokenizer; map tokens to IDs; pad token sequences; create attention masks
+    '''
     input_ids = []
     atten_masks = []
     for s in strings:
@@ -87,8 +29,9 @@ def encode_strings(strings, labels):
         #   (4) Map tokens to their IDs.
         #   (5) Pad or truncate the sentence to `max_length`
         #   (6) Create attention masks for [PAD] tokens.
+        processed_string = preprocess_tweet(s)
         encoded_dict = tokenizer.encode_plus(
-            s,  # Sentence to encode.
+            processed_string,  # Sentence to encode.
             add_special_tokens=True,  # Add '[CLS]' and '[SEP]'
             max_length=MAX_TOKENIZED_TWEET_LENGTH,  # Pad & truncate all sentences.
             truncation=True,
