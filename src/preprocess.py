@@ -1,6 +1,6 @@
 from nltk import tokenize
 
-from src.load import detokenize_tweet
+from load import detokenize_tweet
 
 tweet_tokenizer = tokenize.TweetTokenizer()
 

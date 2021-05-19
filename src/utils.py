@@ -3,7 +3,7 @@ import torch
 from torch.utils.data import random_split, TensorDataset, DataLoader, RandomSampler, SequentialSampler
 from transformers import BertTokenizer
 
-from src.preprocess import preprocess_tweet
+from preprocess import preprocess_tweet
 
 LABEL_INDICES = {
     'negative': 0,
