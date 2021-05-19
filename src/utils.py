@@ -17,45 +17,6 @@ BERT_MODEL_NAME = 'bert-base-multilingual-cased'
 tokenizer = BertTokenizer.from_pretrained(BERT_MODEL_NAME)
 
 
-def load_data(training_file, bert=True):
-    """ Takes a file object (not path string) for training_file
-
-    If bert:
-    returns (tweet_ids, tweets, sentiment_labels), where each tweet is a [(token, tag), (token, tag), (token, tag)] list
-
-    If not bert:
-    returns (tweet_ids, tweets, sentiment_labels), where each tweet is a string, with no language tags included.
-    """
-    tweets = []
-    tweet_ids = []
-    sentiments = []
-    tweet = []
-    for line in training_file:
-        if line.strip() and line.split()[0] == 'meta' and not tweet:
-            _, tweet_id, sentiment = line.strip().split('\t')
-            tweet_ids.append(tweet_id)
-            sentiments.append(sentiment)
-        elif line.strip():
-            if len(line.strip().split('\t')) == 2:
-                token, lang = tuple(line.strip().split('\t'))
-                if bert:
-                    tweet.append(token)
-                else:
-                    tweet.append((token, lang))
-        elif tweet:
-            if bert:
-                tweets.append(' '.join(tweet))
-            else:
-                tweets.append(tuple(tweet))
-            tweet = []
-    if tweet:
-        if bert:
-            tweets.append(' '.join(tweet))
-        else:
-            tweets.append(tuple(tweet))
-    return np.array(tweet_ids), np.array(tweets), np.array(sentiments)
-
-
 def encode_strings(strings, labels):
     '''Preprocess tweet strings; tokenize with BERT tokenizer; map tokens to IDs; pad token sequences; create attention masks
     '''

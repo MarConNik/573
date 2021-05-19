@@ -9,7 +9,8 @@ from tqdm import tqdm
 from transformers import AdamW, get_linear_schedule_with_warmup
 from pandas import DataFrame
 
-from utils import load_data, BERT_MODEL_NAME, encode_strings, get_dataloaders
+from utils import BERT_MODEL_NAME, encode_strings, get_dataloaders
+from src.load import load_data
 from transformers.models.bert.modeling_bert import BertPreTrainedModel, BertForSequenceClassification
 from torch.utils.data import DataLoader
 
