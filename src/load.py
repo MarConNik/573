@@ -2,7 +2,14 @@ __doc__ = '''Utils for loading tweets (as strings) and labels from the ConLL fil
 '''
 
 import numpy as np
+from emoji_translate.emoji_translate import Translator
+emo = Translator(exact_match_only=False, randomize=True)
 
+def translate_emoji(tok):
+    new_tok = emo.demojify(tok)
+    if new_tok != tok:
+        new_tok = emo.demojify(' '.join(tok))
+    return new_tok
 
 def detokenize_tweet(tokens):
     """ Take a list of tokens (in Spanglish or Hinglish format) and return a tweet string
@@ -61,7 +68,7 @@ def load_data(data_file, with_labels=True):
         elif line.strip():
             if len(line.strip().split('\t')) == 2:
                 token, lang = tuple(line.strip().split('\t'))
-                tweet.append(token)
+                tweet.append(translate_emoji(token))
         elif tweet:
             tweets.append(detokenize_tweet(tweet))
             tweet = []
