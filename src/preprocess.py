@@ -1,5 +1,6 @@
 from nltk import tokenize
 
+from src.load import detokenize_tweet
 
 tweet_tokenizer = tokenize.TweetTokenizer()
 
@@ -20,4 +21,4 @@ def preprocess_tweet(tweet):
     '''Preprocess a tweet string by running NLTK tweet tokenizer on it, then filtering those tokens for
     '''
     tokens = tweet_tokenizer.tokenize(tweet)
-    return ' '.join(tokens)
+    return detokenize_tweet(tokens)

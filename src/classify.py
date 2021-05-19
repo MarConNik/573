@@ -2,6 +2,8 @@ import argparse
 import joblib
 import numpy as np
 import csv
+
+from src.load import load_data
 from utils import encode_strings, INDEX_LABELS
 import torch
 from transformers import BertForSequenceClassification
@@ -14,41 +16,6 @@ python src/classify.py --model-directory outputs/SpanglishModel-V0/ --test-file 
 '''
 
 DEFAULT_BATCH_SIZE = 32
-
-def load_test_data(test_file, bert=True):
-    """ Takes a file object (not path string) for training_file
-
-    If bert:
-    returns (tweet_ids, tweets), where each tweet is a [(token, tag), (token, tag), (token, tag)] list
-
-    If not bert:
-    returns (tweet_ids, tweets), where each tweet is a string, with no language tags included.
-    """
-    tweets = []
-    tweet_ids = []
-    tweet = []
-    for line in test_file:
-        if line.strip() and line.split()[0] == 'meta' and not tweet:
-            tweet_ids.append(line.strip().split('\t')[1])
-        elif line.strip():
-            if len(line.strip().split('\t')) == 2:
-                token, lang = tuple(line.strip().split('\t'))
-                if bert:
-                    tweet.append(token)
-                else:
-                    tweet.append((token, lang))
-        elif tweet:
-            if bert:
-                tweets.append(' '.join(tweet))
-            else:
-                tweets.append(tuple(tweet))
-            tweet = []
-    if tweet:
-        if bert:
-            tweets.append(' '.join(tweet))
-        else:
-            tweets.append(tuple(tweet))
-    return np.array(tweet_ids), np.array(tweets)
 
 
 def output_predictions(X_ids, z, output_file):
@@ -92,7 +59,7 @@ if __name__ == '__main__':
         device = torch.device("cpu")
 
     # Load test data
-    X_ids, X = load_test_data(args.test_file)
+    X_ids, X = load_data(args.test_file, with_labels=False)
     input_ids, attention_masks, _ = encode_strings(X, [])
     dataset = TensorDataset(input_ids, attention_masks)
 
