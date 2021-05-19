@@ -17,7 +17,7 @@ BERT_MODEL_NAME = 'bert-base-multilingual-cased'
 tokenizer = BertTokenizer.from_pretrained(BERT_MODEL_NAME)
 
 
-def load_train_data(training_file, bert=True):
+def load_data(training_file, bert=True):
     """ Takes a file object (not path string) for training_file
 
     If bert:
