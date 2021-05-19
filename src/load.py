@@ -14,7 +14,7 @@ def detokenize_tweet(tokens):
     for token in tokens:
         if prev_token == '' and prev_prev_token == '':
             tweet += token
-        elif token == '//' and prev_token == 'https':
+        elif token == '//' and prev_token in ('https', 'http'):
             tweet += ':' + token
         elif prev_token == '//' and token == 't':
             tweet += token

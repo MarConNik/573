@@ -20,5 +20,5 @@ def preprocess_token(token):
 def preprocess_tweet(tweet):
     '''Preprocess a tweet string by running NLTK tweet tokenizer on it, then filtering those tokens for
     '''
-    tokens = tweet_tokenizer.tokenize(tweet)
-    return detokenize_tweet(tokens)
+    tokens = tweet.split(' ')
+    return detokenize_tweet([preprocess_token(token) for token in tokens])

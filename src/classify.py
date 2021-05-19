@@ -1,10 +1,8 @@
 import argparse
-import joblib
 import numpy as np
 import csv
-
 from src.load import load_data
-from utils import encode_strings, INDEX_LABELS
+from src.utils import encode_strings, INDEX_LABELS
 import torch
 from transformers import BertForSequenceClassification
 from torch.utils.data import TensorDataset, DataLoader, SequentialSampler
