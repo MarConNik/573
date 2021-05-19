@@ -235,7 +235,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Get training tweets from file
-    tweet_ids, tweets, sentiment_labels = load_data(args.train_file, bert=True)
+    tweet_ids, tweets, sentiment_labels = load_data(args.train_file)
 
     # Convert tweets to BERT-readable format
     input_ids, attention_masks, sentiment_labels = encode_strings(tweets, sentiment_labels)
