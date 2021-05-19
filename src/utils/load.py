@@ -1,6 +1,7 @@
 __doc__ = '''Utils for loading tweets (as strings) and labels from the ConLL files provided in the SentiMix Challenge
 '''
 
+import ftfy
 import numpy as np
 
 
@@ -61,7 +62,7 @@ def load_data(data_file, with_labels=True):
         elif line.strip():
             if len(line.strip().split('\t')) == 2:
                 token, lang = tuple(line.strip().split('\t'))
-                tweet.append(token)
+                tweet.append(ftfy.fix_text(token))
         elif tweet:
             tweets.append(detokenize_tweet(tweet))
             tweet = []
