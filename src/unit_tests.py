@@ -27,6 +27,8 @@ def test_dataloaders():
         input_ids, attention_masks, labels = batch
         assert attention_masks.shape[0] == BATCH_SIZE
         break
+
+
 def test_translate_emoji():
   input_str = '🔥😂💁😂😁👌'
   expected_output = 'fire joy tipping hand woman joy grin ok hand'
