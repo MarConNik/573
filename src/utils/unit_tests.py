@@ -1,4 +1,4 @@
-from .bert import encode_strings, get_dataloaders
+from .bert import encode_strings, get_dataloaders, MAX_TOKENIZED_TWEET_LENGTH
 from .load import load_data
 
 
@@ -21,6 +21,10 @@ def test_dataloaders():
         # Assert first batch is a full batch of correct length:
         input_ids, attention_masks, labels = batch
         assert input_ids.shape[0] == BATCH_SIZE
+        assert input_ids.shape[1] == MAX_TOKENIZED_TWEET_LENGTH
+        assert len(input_ids.shape) == 2
+        assert attention_masks.shape[0] == BATCH_SIZE
+        assert attention_masks.shape[1] == MAX_TOKENIZED_TWEET_LENGTH
         break
 
     for batch in validation_dataloader:
