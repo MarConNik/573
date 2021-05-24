@@ -64,7 +64,6 @@ def train_model(
     num_labels: int,
     num_epochs: int,
     learning_rate: float,
-    random_seed: int,
     epsilon: float,
     pretrained_model: str = BERT_MODEL_NAME,
     model_directory: str = None
@@ -105,7 +104,7 @@ def train_model(
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)  # FIXME: Change from CUDA if you're using a different GPU architecture
+    torch.cuda.manual_seed_all(seed)
 
     # Initialize object to keep track of training steps
     stats_logger = StatsLogger(num_epochs=num_epochs)
@@ -258,6 +257,5 @@ if __name__ == '__main__':
         epsilon=args.epsilon,
         learning_rate=args.learning_rate,
         num_epochs=args.epochs,
-        random_seed=args.random_seed,
         model_directory=args.model_directory
     )
