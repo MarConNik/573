@@ -1,7 +1,6 @@
 from .bert import encode_strings, get_dataloaders
 from .load import load_data
-from .preprocess import translate_emoji
-
+from .preprocess import translate_emoji, preprocess_tweet
 
 BATCH_SIZE = 32
 SPANGLISH_TRAIN_PATH = 'data/Semeval_2020_task9_data/Spanglish/Spanglish_train.conll'
@@ -39,7 +38,7 @@ def test_fix_encoding():
     assert tweets[11999] == good_string
 
 
-def test_translate_emoji():
-  input_str = '🔥😂💁😂😁👌'
-  expected_output = 'fire joy tipping hand woman joy grin ok hand'
-  assert translate_emoji(input_str) == expected_output
+def test_preprocessing():
+    tweet = 'The best fall is... Fall in LOVE ❤ ️💌 Collar rojo $ 14.90 Pedidos 096.880.7384 #neckless #collar #accesorios http://t.co/6brIVHD2Xx'
+    preprocessed_tweet = preprocess_tweet(tweet)
+    assert preprocessed_tweet == 'The best fall is... Fall in LOVE red heart  love letter Collar rojo $ 14.90 Pedidos 096.880.7384 #neckless #collar #accesorios HTTPURL'

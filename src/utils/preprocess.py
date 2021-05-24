@@ -7,6 +7,13 @@ emo = Translator(exact_match_only=False, randomize=True)
 tweet_tokenizer = tokenize.TweetTokenizer()
 
 
+def translate_emoji(tok):
+    new_tok = emo.demojify(tok)
+    if new_tok != tok:
+        new_tok = emo.demojify(' '.join(tok))
+    return new_tok
+
+
 def preprocess_token(token):
     '''Preprocess a token (as produced by the NLTK tweet tokenizer) in a tweet; replace URLs and twitter handles with
     generic token
@@ -19,11 +26,6 @@ def preprocess_token(token):
     else:
         return token
 
-def translate_emoji(tok):
-    new_tok = emo.demojify(tok)
-    if new_tok != tok:
-        new_tok = emo.demojify(' '.join(tok))
-    return new_tok
 
 def preprocess_tweet(tweet):
     '''Preprocess a tweet string by running NLTK tweet tokenizer on it, then filtering those tokens for
