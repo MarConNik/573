@@ -1,9 +1,9 @@
 import numpy as np
 import torch
-from torch.utils.data import random_split, TensorDataset, DataLoader, RandomSampler, SequentialSampler
+from torch.utils.data import TensorDataset, random_split, DataLoader, RandomSampler, SequentialSampler
 from transformers import BertTokenizer
 
-from preprocess import preprocess_tweet
+from .preprocess import preprocess_tweet
 
 LABEL_INDICES = {
     'negative': 0,

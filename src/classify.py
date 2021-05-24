@@ -1,17 +1,16 @@
 import argparse
 import numpy as np
 import csv
-from load import load_data
-from utils import encode_strings, INDEX_LABELS
+from utils.load import load_data
+from utils.bert import INDEX_LABELS, encode_strings
 import torch
 from transformers import BertForSequenceClassification
-from torch.utils.data import TensorDataset, DataLoader, SequentialSampler
-
-
+from torch.utils.data import TensorDataset, DataLoader
 
 '''E.g.:
 python src/classify.py --model-directory outputs/SpanglishModel-V0/ --test-file data/Semeval_2020_task9_data/Spanglish/Spanglish_test_conll_unlabeled.txt --output-file Spanglish_predictions.txt
 '''
+
 
 DEFAULT_BATCH_SIZE = 32
 
