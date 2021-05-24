@@ -19,7 +19,7 @@ class BertLSTMClassifier(nn.Module):
 
         # Bidirectional LSTM Layer
         self.lstm_hidden_size = lstm_hidden_size
-        self.lstm1 = nn.LSTM(
+        self.lstm = nn.LSTM(
             input_size=bert_embedding_size,
             hidden_size=lstm_hidden_size,
             bidirectional=True,
@@ -37,7 +37,7 @@ class BertLSTMClassifier(nn.Module):
         # Feed that sequence of contextual token embeddings
         sequence_length = attention_mask.sum(dim=1)
         packed_input = pack_padded_sequence(contextual_embeddings, sequence_length)
-        packed_lstm_output = self.lstm1(packed_input)
+        packed_lstm_output, _ = self.lstm(packed_input, sequence_length)
         lstm_output, sequence_length = pad_packed_sequence(packed_lstm_output, batch_first=True)
 
         # Get last hidden state of the forward (part of the) LSTM
