@@ -1,6 +1,8 @@
 # python3 calculate_f1.py gold_file model_output > results.txt
 
 import sys
+
+import numpy as np
 from sklearn.metrics import f1_score, precision_recall_fscore_support
 
 gold_file_path = sys.argv[1]
@@ -64,3 +66,8 @@ for row in confusion.keys():
     for col, cnt in confusion[row].items():
         sys.stdout.write(f' {str(cnt).ljust(8)}')
     sys.stdout.write("\n")
+
+
+sys.stdout.write("\n")
+raw_accuracy = (np.array(gold_predictions) == np.array(model_predictions)).mean()
+print(f"Raw accuracy: {raw_accuracy}")
