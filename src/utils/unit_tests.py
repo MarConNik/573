@@ -1,6 +1,7 @@
 from .bert import encode_strings, get_dataloaders
 from .load import load_data
-from .preprocess import translate_emoji, preprocess_tweet
+from .preprocess import preprocess_tweet
+
 
 BATCH_SIZE = 32
 SPANGLISH_TRAIN_PATH = 'data/Semeval_2020_task9_data/Spanglish/Spanglish_train.conll'
