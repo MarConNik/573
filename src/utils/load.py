@@ -4,7 +4,6 @@ __doc__ = '''Utils for loading tweets (as strings) and labels from the ConLL fil
 import ftfy
 import numpy as np
 
-
 def detokenize_tweet(tokens):
     """ Take a list of tokens (in Spanglish or Hinglish format) and return a tweet string
     (e.g. ["@", "connor", ",", "how", "are", "you", "?"] -> "@connor, how are you?")
