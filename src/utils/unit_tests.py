@@ -1,5 +1,6 @@
 from .bert import encode_strings, get_dataloaders
 from .load import load_data
+from .preprocess import preprocess_tweet
 
 
 BATCH_SIZE = 32
@@ -36,3 +37,9 @@ def test_fix_encoding():
 
     good_string = 'The best fall is... Fall in LOVE ❤ ️💌 Collar rojo $ 14.90 Pedidos 096.880.7384 #neckless #collar #accesorios http://t.co/6brIVHD2Xx'
     assert tweets[11999] == good_string
+
+
+def test_preprocessing():
+    tweet = 'The best fall is... Fall in LOVE ❤ ️💌 Collar rojo $ 14.90 Pedidos 096.880.7384 #neckless #collar #accesorios http://t.co/6brIVHD2Xx'
+    preprocessed_tweet = preprocess_tweet(tweet)
+    assert preprocessed_tweet == 'The best fall is... Fall in LOVE red heart  love letter Collar rojo $ 14.90 Pedidos 096.880.7384 #neckless #collar #accesorios HTTPURL'
