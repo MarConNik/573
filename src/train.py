@@ -11,7 +11,6 @@ from pandas import DataFrame
 from utils.model import BertLSTMClassifier
 from utils.bert import BERT_MODEL_NAME, encode_strings, get_dataloaders
 from utils.load import load_data
-from transformers.models.bert.modeling_bert import BertPreTrainedModel
 from torch.utils.data import DataLoader
 
 
