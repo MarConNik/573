@@ -79,11 +79,8 @@ if __name__ == '__main__':
         b_input_ids, b_input_mask = batch
 
         # For some reason we have to globally disable gradient accumulation (in addition to setting model to `eval()`)
-        with torch.no_grad(): result = model(b_input_ids,
-                         token_type_ids=None,
-                         attention_mask=b_input_mask,
-                         return_dict=True)
-        batch_logits = result.logits
+        with torch.no_grad():
+            batch_logits = model(b_input_ids, attention_mask=b_input_mask)
         logits = batch_logits.detach().cpu().numpy()
         predictions += [INDEX_LABELS[np.argmax(values)] for values in logits]
 
