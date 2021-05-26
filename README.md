@@ -7,7 +7,15 @@ The [shared document report](https://www.overleaf.com/project/60666a8f489d2af234
 
 The cached Spanglish model for D3 is committed to this repository. It requires `git-lfs` to download the actual file; by
 default, cloning this repository will only download a metadata file of the PyTorch model
-file (`outputs/D3/Spanglish-ModelV3.2/pytorch_model.bin`) to your local environment. If you can't get `git-lfs` to
+file (`outputs/D3/Spanglish-ModelV3.2/pytorch_model.bin`) to your local environment. `git-lfs` is included
+in the conda environment. To activate LFS and download the cached model run the following commands:
+```
+git lfs install
+git lfs fetch
+git lfs pull
+```
+
+If you can't get `git-lfs` to
 download the full 700+ MB trained model, you can
 use [this link](https://drive.google.com/drive/folders/10U76ymJpjGbqNlExJ5PnelO5nb-45KCd?usp=sharing) to reach a copy of
 the same model file on our shared Google Drive.
@@ -27,7 +35,7 @@ with a path to save the model.
 ## Data
 
 These represent the maximum tokenized tweet lengths from the BERT tokenizer
-for our train, dev, and test files for Spanglish and Hinglish. 
+for our train, dev, and test files for Spanglish and Hinglish.
 E.G.: r, ##t, @, fra, ##lal, ##icio, ##ux, ##xe, t, ##bh, i, have, bad, sides, too, ., when, i, say, bad, it, ', s, ho, ##rri, ##bly, bad, .
 Spanglish_train.conll: 73
 Spanglish_dev.conll: 69
