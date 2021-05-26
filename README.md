@@ -29,12 +29,12 @@ with a path to save the model.
 These represent the maximum tokenized tweet lengths from the BERT tokenizer
 for our train, dev, and test files for Spanglish and Hinglish. 
 E.G.: r, ##t, @, fra, ##lal, ##icio, ##ux, ##xe, t, ##bh, i, have, bad, sides, too, ., when, i, say, bad, it, ', s, ho, ##rri, ##bly, bad, .
-Spanglish_train.conll: 73
-Spanglish_dev.conll: 69
-Spanglish_test_conll_unlabeled.txt: 117
-Hinglish_train_14k_split_conll.txt: 82
-Hinglish_dev_3k_split_conll.txt: 79
-Hinglish_test_unlabeled_conll_updated.txt: 127
+Spanglish_train.conll: 82
+Spanglish_dev.conll: 78
+Spanglish_test_conll_unlabeled.txt: 76
+Hinglish_train_14k_split_conll.txt: 85
+Hinglish_dev_3k_split_conll.txt: 70
+Hinglish_test_unlabeled_conll_updated.txt: 77
 
 ## Classifier
 
