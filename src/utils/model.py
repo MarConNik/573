@@ -3,9 +3,10 @@ import torch
 from torch import nn
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 from transformers import BertModel
-
 from .bert import BERT_MODEL_NAME
 
+
+MODEL_FILENAME = 'model.pt'
 LSTM_HIDDEN_SIZE = 100
 
 
