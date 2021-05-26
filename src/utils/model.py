@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from torch import nn
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
@@ -25,6 +26,7 @@ class BertLSTMClassifier(nn.Module):
         self.lstm = nn.LSTM(
             input_size=bert_embedding_size,
             hidden_size=lstm_hidden_size,
+            batch_first=True,
             bidirectional=True,
         )
 
@@ -39,16 +41,20 @@ class BertLSTMClassifier(nn.Module):
         # (Through the magic of tensors, this is all [foreach sequence])
 
         # Get contextual token embeddings from BERT
-        contextual_embeddings = self.bert(input_ids, attention_mask)
+        contextual_embeddings = self.bert(input_ids, attention_mask)[0]
 
         # Feed that sequence of contextual token embeddings
-        sequence_length = attention_mask.sum(dim=1)
-        packed_input = pack_padded_sequence(contextual_embeddings, sequence_length)
-        packed_lstm_output, _ = self.lstm(packed_input, sequence_length)
-        lstm_output, sequence_length = pad_packed_sequence(packed_lstm_output, batch_first=True)
+        sequence_length: np.array = attention_mask.sum(dim=1).detach().cpu().numpy()
+        packed_input = pack_padded_sequence(contextual_embeddings, sequence_length, batch_first=True, enforce_sorted=False)
+        packed_lstm_output, _ = self.lstm(packed_input)
+        lstm_output, _ = pad_packed_sequence(packed_lstm_output, batch_first=True)
 
         # Get last hidden state of the forward (part of the) LSTM
-        forward_out = lstm_output[:, sequence_length-1, :self.lstm_hidden_size]
+        forward_outs = []
+        for last, sequence_tensor in zip(sequence_length-1, lstm_output):
+            last_hidden = sequence_tensor[min(last, len(sequence_tensor)-1), :self.lstm_hidden_size]
+            forward_outs.append(last_hidden)
+        forward_out = torch.stack(forward_outs)
         reverse_out = lstm_output[:, 0, self.lstm_hidden_size:]
 
         # Concatenate the two last LSTM hidden states, pass to feed-forward
