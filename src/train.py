@@ -8,7 +8,7 @@ from tqdm import tqdm
 from transformers import AdamW, get_linear_schedule_with_warmup
 from pandas import DataFrame
 
-from utils.model import BertLSTMClassifier
+from utils.model import BertLSTMClassifier, MODEL_FILENAME
 from utils.bert import BERT_MODEL_NAME, encode_strings, get_dataloaders
 from utils.load import load_data
 from torch.utils.data import DataLoader
@@ -78,6 +78,7 @@ def train_model(
         model.cuda()
     else:
         device = torch.device("cpu")
+        model.to(device)
 
     # FIXME: The tutorial that we are following says to use the HuggingFace/Transformers version; there is a PyTorch
     #  version now, though.
@@ -204,7 +205,7 @@ def save_model(model: BertLSTMClassifier, model_directory: str, name: str):
     instance_directory = os.path.join(model_directory, name)
     if not os.path.exists(instance_directory):
         os.makedirs(instance_directory)
-    instance_path = os.path.join(instance_directory, 'model.pt')
+    instance_path = os.path.join(instance_directory, MODEL_FILENAME)
 
     # Save model
     state_dict = model.state_dict()
