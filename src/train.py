@@ -7,9 +7,11 @@ import torch
 from tqdm import tqdm
 from transformers import AdamW, get_linear_schedule_with_warmup
 from pandas import DataFrame
+
+from utils.model import BertLSTMClassifier
 from utils.bert import BERT_MODEL_NAME, encode_strings, get_dataloaders
 from utils.load import load_data
-from transformers.models.bert.modeling_bert import BertPreTrainedModel, BertForSequenceClassification
+from transformers.models.bert.modeling_bert import BertPreTrainedModel
 from torch.utils.data import DataLoader
 
 
@@ -67,14 +69,8 @@ def train_model(
     epsilon: float,
     pretrained_model: str = BERT_MODEL_NAME,
     model_directory: str = None
-) -> BertPreTrainedModel:
-    model: BertForSequenceClassification = BertForSequenceClassification.from_pretrained(
-        pretrained_model,  # Use the 12-layer BERT model, with an uncased vocab.
-        num_labels=num_labels,  # The number of output labels; -, 0, + for sentiment
-        # You can increase this for multi-class tasks.
-        output_attentions=False,  # Whether the model returns attentions weights.
-        output_hidden_states=False,  # Whether the model returns all hidden-states.
-    )
+):
+    model = BertLSTMClassifier(num_labels=num_labels)
 
     # Use CUDA if it's available
     if torch.cuda.is_available():
@@ -150,13 +146,11 @@ def train_model(
             model.zero_grad()
 
             # Run model on batch (it accumulates loss gradient internally)
-            result = model(
+            batch_loss = model(
                 batch_input_ids,
                 attention_mask=batch_attention_masks,
-                labels=batch_sentiment_labels,
-                return_dict=True
+                labels=batch_sentiment_labels
             )
-            batch_loss = result.loss
             total_training_loss += batch_loss.detach().cpu().numpy()
 
             # Backpropagate the loss
@@ -188,14 +182,12 @@ def train_model(
 
             # For some reason we have to globally disable gradient accumulation (in addition to setting model to `eval()`)
             with torch.no_grad():
-                result = model(
+                batch_loss = model(
                     batch_input_ids,
                     attention_mask=batch_attention_masks,
-                    labels=batch_sentiment_labels,
-                    return_dict=True
+                    labels=batch_sentiment_labels
                 )
 
-            batch_loss = result.loss
             total_validation_loss += batch_loss.detach().cpu().numpy()
 
         mean_validation_loss = total_validation_loss / len(validation_dataloader)
@@ -205,16 +197,21 @@ def train_model(
     stats_logger.save(model_directory)
 
 
-def save_model(model: BertPreTrainedModel, model_directory: str, name: str):
+def save_model(model: BertLSTMClassifier, model_directory: str, name: str):
     """ Save model to `model_directory/name`
     """
+
+    # Create model instance directory
     instance_directory = os.path.join(model_directory, name)
     if not os.path.exists(instance_directory):
         os.makedirs(instance_directory)
+    instance_path = os.path.join(instance_directory, 'model.pt')
+
+    # Save model
+    state_dict = model.state_dict()
+    torch.save(state_dict, instance_path)
 
     print(f"\nSaving model '{name}' to {model_directory}")
-
-    model.save_pretrained(instance_directory)
 
 
 if __name__ == '__main__':
