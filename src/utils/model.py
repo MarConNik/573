@@ -53,10 +53,10 @@ class BertLSTMClassifier(nn.Module):
         # Get last hidden state of the forward (part of the) LSTM
         forward_outs = []
         for last, sequence_tensor in zip(sequence_length-1, lstm_output):
-            last_hidden = sequence_tensor[min(last, len(sequence_tensor)-1), self.lstm_hidden_size:]
+            last_hidden = sequence_tensor[min(last, len(sequence_tensor)-1), :self.lstm_hidden_size]
             forward_outs.append(last_hidden)
         forward_out = torch.stack(forward_outs)
-        reverse_out = lstm_output[:, 0, :self.lstm_hidden_size]
+        reverse_out = lstm_output[:, 0, self.lstm_hidden_size:]
 
         # Concatenate the two last LSTM hidden states, pass to feed-forward
         sequence_vector = torch.cat((forward_out, reverse_out), dim=-1)
