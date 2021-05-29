@@ -26,8 +26,8 @@ def get_class_weights(labels: Tensor):
         labels: Tensor of integer indices for classes
     """
     labels_array = labels.detach().cpu().numpy()
-    return torch.tensor(compute_class_weight('balanced', np.unique(
-                        labels_array), labels_array), dtype=torch.float)
+    return torch.tensor(compute_class_weight('balanced', np.unique(labels),
+                        labels), dtype=torch.float)
 
 
 def encode_strings(strings, labels):
