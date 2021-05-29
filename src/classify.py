@@ -64,8 +64,8 @@ if __name__ == '__main__':
         model.to(device)
 
     # Load test data
-    X_ids, X = load_data(args.test_file, with_labels=False)
-    input_ids, attention_masks, _ = encode_strings(X, [])
+    X_ids, X, tags = load_data(args.test_file, with_labels=False)
+    input_ids, attention_masks, _ = encode_strings(X, [], tags)
     dataset = TensorDataset(input_ids, attention_masks)
 
     prediction_dataset = DataLoader(dataset, batch_size = args.batch_size)

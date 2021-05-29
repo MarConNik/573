@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 from torch.utils.data import TensorDataset, random_split, DataLoader, RandomSampler, SequentialSampler
-from transformers import BertTokenizer
+from transformers import BertTokenizerFast
 
 from .preprocess import preprocess_tweet
 
@@ -14,30 +14,33 @@ INDEX_LABELS = {value: key for key, value in LABEL_INDICES.items()}
 DEFAULT_TRAIN_SHARE = 0.90
 MAX_TOKENIZED_TWEET_LENGTH = 140
 BERT_MODEL_NAME = 'bert-base-multilingual-cased'
-tokenizer = BertTokenizer.from_pretrained(BERT_MODEL_NAME)
+tokenizer = BertTokenizerFast.from_pretrained(BERT_MODEL_NAME)
 
-
-def encode_strings(strings, labels):
-    '''Preprocess tweet strings; tokenize with BERT tokenizer; map tokens to IDs; pad token sequences; create attention masks
+def encode_strings(tokens, labels, tags):
+    '''Preprocess tweet tokens; tokenize with BERT tokenizer; map tokens to IDs; pad token sequences; create attention masks
     '''
     input_ids = []
     atten_masks = []
-    for s in strings:
+    for i, t in enumerate(tokens):
         #   (1) Tokenize the sentence.
         #   (2) Prepend the `[CLS]` token to the start.
         #   (3) Append the `[SEP]` token to the end.
         #   (4) Map tokens to their IDs.
         #   (5) Pad or truncate the sentence to `max_length`
         #   (6) Create attention masks for [PAD] tokens.
-        processed_string = preprocess_tweet(s)
+        processed_tokens = preprocess_tweet(t, tags[i])
         encoded_dict = tokenizer.encode_plus(
-            processed_string,  # Sentence to encode.
+            processed_tokens,  # Sentence to encode.
             add_special_tokens=True,  # Add '[CLS]' and '[SEP]'
             max_length=MAX_TOKENIZED_TWEET_LENGTH,  # Pad & truncate all sentences.
             truncation=True,
             padding='max_length',
             return_attention_mask=True,  # Construct attn. masks.
+            is_split_into_words=True, # Already split into tokens
             return_tensors='pt', )  # Return pytorch tensors.
+        print(f'Before: {t}')
+        print(f'After: {processed_tokens}')
+
 
         # Add the encoded sentence to the list.
         input_ids.append(encoded_dict['input_ids'])
@@ -47,7 +50,7 @@ def encode_strings(strings, labels):
     input_ids = torch.cat(input_ids, dim=0)
     attention_masks = torch.cat(atten_masks, dim=0)
 
-    # Convert label strings to integers
+    # Convert label tokens to integers
     all_labels = set(labels)
     label_ints = np.array([LABEL_INDICES[label] for label in labels])
     label_tensor = torch.tensor(label_ints)

@@ -9,8 +9,8 @@ SPANGLISH_TRAIN_PATH = 'data/Semeval_2020_task9_data/Spanglish/Spanglish_train.c
 
 def test_dataloaders():
     with open(SPANGLISH_TRAIN_PATH, 'r', encoding='latin-1') as training_file:
-        tweet_ids, tweets, sentiment_labels = load_data(training_file)
-    input_ids, attention_masks, sentiment_labels = encode_strings(tweets, sentiment_labels)
+        tweet_ids, tweets, tags, sentiment_labels = load_data(training_file)
+    input_ids, attention_masks, sentiment_labels = encode_strings(tweets, sentiment_labels, tags)
     training_dataloader, validation_dataloader = get_dataloaders(
         input_ids=input_ids,
         attention_masks=attention_masks,
@@ -37,7 +37,7 @@ def test_dataloaders():
 
 def test_fix_encoding():
     with open(SPANGLISH_TRAIN_PATH, 'r', encoding='latin-1') as training_file:
-        tweet_ids, tweets, sentiment_labels = load_data(training_file, with_labels=True)
+        tweet_ids, tweets, tags, sentiment_labels = load_data(training_file, with_labels=True)
 
     good_string = 'The best fall is... Fall in LOVE ❤ ️💌 Collar rojo $ 14.90 Pedidos 096.880.7384 #neckless #collar #accesorios http://t.co/6brIVHD2Xx'
     assert tweets[11999] == good_string
