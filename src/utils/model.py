@@ -3,7 +3,7 @@ import torch
 from torch import nn
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 from transformers import BertModel
-from .bert import BERT_MODEL_NAME
+from .bert import BERT_MODEL_NAME, TAG_FEATURES
 
 
 MODEL_FILENAME = 'model.pt'
@@ -26,7 +26,7 @@ class BertLSTMClassifier(nn.Module):
         # Bidirectional LSTM Layer
         self.lstm_hidden_size = lstm_hidden_size
         self.lstm = nn.LSTM(
-            input_size=bert_embedding_size,
+            input_size=(bert_embedding_size+TAG_FEATURES),
             hidden_size=lstm_hidden_size,
             num_layers=LSTM_LAYERS,
             batch_first=True,
@@ -40,15 +40,16 @@ class BertLSTMClassifier(nn.Module):
         # TODO: Incorporate class weights here
         self.loss = nn.CrossEntropyLoss()
 
-    def forward(self, input_ids, attention_mask, labels=None):
+    def forward(self, input_ids, attention_mask, tags, labels=None):
         # (Through the magic of tensors, this is all [foreach sequence])
 
         # Get contextual token embeddings from BERT
         contextual_embeddings = self.bert(input_ids, attention_mask)[0]
+        combined_embeddings = torch.cat((contextual_embeddings, tags),-1).float()
 
         # Feed that sequence of contextual token embeddings
         sequence_length: np.array = attention_mask.sum(dim=1).detach().cpu().numpy()
-        packed_input = pack_padded_sequence(contextual_embeddings, sequence_length, batch_first=True, enforce_sorted=False)
+        packed_input = pack_padded_sequence(combined_embeddings, sequence_length, batch_first=True, enforce_sorted=False)
         packed_lstm_output, _ = self.lstm(packed_input)
         lstm_output, _ = pad_packed_sequence(packed_lstm_output, batch_first=True)
 

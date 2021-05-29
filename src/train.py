@@ -141,6 +141,7 @@ def train_model(
             batch_input_ids = batch[0].to(device)
             batch_attention_masks = batch[1].to(device)
             batch_sentiment_labels = batch[2].to(device)
+            batch_tag_sets = batch[3].to(device)
 
             # Clear out previous gradients
             model.zero_grad()
@@ -149,7 +150,8 @@ def train_model(
             batch_loss = model(
                 batch_input_ids,
                 attention_mask=batch_attention_masks,
-                labels=batch_sentiment_labels
+                tags=batch_tag_sets,
+                labels=batch_sentiment_labels,
             )
             total_training_loss += batch_loss.detach().cpu().numpy()
 
@@ -179,12 +181,14 @@ def train_model(
             batch_input_ids = batch[0].to(device)
             batch_attention_masks = batch[1].to(device)
             batch_sentiment_labels = batch[2].to(device)
+            batch_tag_sets = batch[3].to(device)
 
             # For some reason we have to globally disable gradient accumulation (in addition to setting model to `eval()`)
             with torch.no_grad():
                 batch_loss = model(
                     batch_input_ids,
                     attention_mask=batch_attention_masks,
+                    tags=batch_tag_sets,
                     labels=batch_sentiment_labels
                 )
 
@@ -230,14 +234,15 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Get training tweets from file
-    tweet_ids, tweets, sentiment_labels = load_data(args.train_file)
+    tweet_ids, tweets, tags, sentiment_labels = load_data(args.train_file)
 
     # Convert tweets to BERT-readable format
-    input_ids, attention_masks, sentiment_labels = encode_strings(tweets, sentiment_labels)
+    input_ids, attention_masks, sentiment_labels, tag_sets = encode_strings(tweets, sentiment_labels, tags)
     training_dataloader, validation_dataloader = get_dataloaders(
         input_ids=input_ids,
         attention_masks=attention_masks,
         sentiment_labels=sentiment_labels,
+        tag_sets=tag_sets,
         batch_size=args.batch_size
     )
 

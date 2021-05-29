@@ -64,9 +64,9 @@ if __name__ == '__main__':
         model.to(device)
 
     # Load test data
-    X_ids, X = load_data(args.test_file, with_labels=False)
-    input_ids, attention_masks, _ = encode_strings(X, [])
-    dataset = TensorDataset(input_ids, attention_masks)
+    X_ids, X, tags = load_data(args.test_file, with_labels=False)
+    input_ids, attention_masks, _, tag_sets = encode_strings(X, [], tags)
+    dataset = TensorDataset(input_ids, attention_masks, tag_sets)
 
     prediction_dataset = DataLoader(dataset, batch_size = args.batch_size)
 
@@ -76,11 +76,11 @@ if __name__ == '__main__':
         batch = tuple(t.to(device) for t in batch)
 
         # Unpack the inputs from our dataloader
-        b_input_ids, b_input_mask = batch
+        b_input_ids, b_input_mask, b_tag_set = batch
 
         # For some reason we have to globally disable gradient accumulation (in addition to setting model to `eval()`)
         with torch.no_grad():
-            batch_logits = model(b_input_ids, attention_mask=b_input_mask)
+            batch_logits = model(b_input_ids, attention_mask=b_input_mask, tags=b_tag_set)
         logits = batch_logits.detach().cpu().numpy()
         predictions += [INDEX_LABELS[np.argmax(values)] for values in logits]
 
