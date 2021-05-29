@@ -1,6 +1,8 @@
 name: '573'
 channels:
+  - conda-forge
   - defaults
 dependencies:
   - python=3.9
   - pip=21.0
+  - git-lfs=2.13.3
