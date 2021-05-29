@@ -4,12 +4,14 @@ import random
 import time
 import numpy as np
 import torch
+from torch import Tensor
 from tqdm import tqdm
 from transformers import AdamW, get_linear_schedule_with_warmup
 from pandas import DataFrame
 
 from utils.model import BertLSTMClassifier, MODEL_FILENAME
-from utils.bert import BERT_MODEL_NAME, encode_strings, get_dataloaders
+from utils.bert import BERT_MODEL_NAME, encode_strings, get_dataloaders, \
+    get_class_weights
 from utils.load import load_data
 from torch.utils.data import DataLoader
 
@@ -60,25 +62,17 @@ def log_hyperparameters(hyperparameters: dict, directory, filename='hyperparamet
 
 
 def train_model(
+    device,
     training_dataloader: DataLoader,
     validation_dataloader: DataLoader,
-    num_labels: int,
+    class_weights: Tensor,
     num_epochs: int,
     learning_rate: float,
     epsilon: float,
     pretrained_model: str = BERT_MODEL_NAME,
     model_directory: str = None
 ):
-    model = BertLSTMClassifier(num_labels=num_labels)
-
-    # Use CUDA if it's available
-    if torch.cuda.is_available():
-        # Tell PyTorch to use the GPU.
-        device = torch.device("cuda")
-        model.cuda()
-    else:
-        device = torch.device("cpu")
-        model.to(device)
+    model = BertLSTMClassifier(class_weights=class_weights)
 
     # FIXME: The tutorial that we are following says to use the HuggingFace/Transformers version; there is a PyTorch
     #  version now, though.
@@ -229,6 +223,13 @@ if __name__ == '__main__':
     parser.add_argument('--epsilon', type=float, default=DEFAULT_EPSILON)
     args = parser.parse_args()
 
+    # Use CUDA if it's available
+    if torch.cuda.is_available():
+        # Tell PyTorch to use the GPU.
+        device = torch.device("cuda")
+    else:
+        device = torch.device("cpu")
+
     # Get training tweets from file
     tweet_ids, tweets, sentiment_labels = load_data(args.train_file)
 
@@ -241,16 +242,16 @@ if __name__ == '__main__':
         batch_size=args.batch_size
     )
 
-    # Count number of unique labels
-    # FIXME: figure out a good way to make this no longer necessary
-    num_labels = len(torch.unique(sentiment_labels))
-    print(f"Number of unique labels: {num_labels}")
+    # Get class weights
+    class_weights = get_class_weights(sentiment_labels).to(device)
+    print(f"Class weights: {class_weights}")
 
     # Train & save model
     train_model(
+        device=device,
         training_dataloader=training_dataloader,
         validation_dataloader=validation_dataloader,
-        num_labels=num_labels,
+        class_weights=class_weights,
         epsilon=args.epsilon,
         learning_rate=args.learning_rate,
         num_epochs=args.epochs,

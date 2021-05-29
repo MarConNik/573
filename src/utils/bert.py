@@ -1,7 +1,9 @@
 import numpy as np
 import torch
+from torch import Tensor
 from torch.utils.data import TensorDataset, random_split, DataLoader, RandomSampler, SequentialSampler
 from transformers import BertTokenizer
+from sklearn.utils.class_weight import compute_class_weight
 
 from .preprocess import preprocess_tweet
 
@@ -15,6 +17,17 @@ DEFAULT_TRAIN_SHARE = 0.90
 MAX_TOKENIZED_TWEET_LENGTH = 140
 BERT_MODEL_NAME = 'bert-base-multilingual-cased'
 tokenizer = BertTokenizer.from_pretrained(BERT_MODEL_NAME)
+
+
+def get_class_weights(labels: Tensor):
+    """Get class weights inversely-tied to frequency of a given label.
+
+    Args:
+        labels: Tensor of integer indices for classes
+    """
+    labels_array = labels.clone().detach()
+    return torch.tensor(compute_class_weight('balanced', np.unique(
+                        labels_array), labels_array), dtype=torch.float)
 
 
 def encode_strings(strings, labels):
