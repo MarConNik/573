@@ -58,10 +58,12 @@ def encode_strings(tokens, labels, tags):
         # Add the encoded sentence to the list.
         input_ids.append(encoded_dict['input_ids'])
         tag_features = np.zeros((MAX_TOKENIZED_TWEET_LENGTH,TAG_FEATURES))
-        for i, group in enumerate(processed_tags):
+
+        for i, tag_index in enumerate(encoded_dict.words(0)):
             if i == MAX_TOKENIZED_TWEET_LENGTH: break
-            for tag in group:
-                tag_features[i][MAP_TAGS[tag]] += 1
+            if isinstance(tag_index, int):
+                for tag in processed_tags[tag_index]:
+                    tag_features[i][MAP_TAGS[tag]] += 1
         tag_groups.append(tag_features)
 
         # And its attention mask (simply differentiates padding from non-padding).
