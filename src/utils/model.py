@@ -12,8 +12,7 @@ LSTM_LAYERS = 5
 
 
 class BertLSTMClassifier(nn.Module):
-    def __init__(self, class_weights, bert_model=None,
-                 lstm_hidden_size=LSTM_HIDDEN_SIZE):
+    def __init__(self, num_labels, bert_model=None, lstm_hidden_size=LSTM_HIDDEN_SIZE):
         """Initialize LSTM classifier given a BERT instance to use as a contextual embedding layer at the bottom
         """
         super(BertLSTMClassifier, self).__init__()
@@ -35,10 +34,11 @@ class BertLSTMClassifier(nn.Module):
         )
 
         # Final feed-forward linear layer for classification
-        self.fc = nn.Linear(2*lstm_hidden_size, len(class_weights))
+        self.fc = nn.Linear(2*lstm_hidden_size, num_labels)
 
         # Cross entropy loss calculator
-        self.loss = nn.CrossEntropyLoss(weight=class_weights)
+        # TODO: Incorporate class weights here
+        self.loss = nn.CrossEntropyLoss()
 
     def forward(self, input_ids, attention_mask, labels=None):
         # (Through the magic of tensors, this is all [foreach sequence])
