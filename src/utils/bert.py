@@ -25,7 +25,7 @@ def get_class_weights(labels: Tensor):
     Args:
         labels: Tensor of integer indices for classes
     """
-    labels_array = labels.detach().cpu().numpy()
+    labels_array = labels.clone().detach()
     return torch.tensor(compute_class_weight('balanced', np.unique(
                         labels_array), labels_array), dtype=torch.float)
 
