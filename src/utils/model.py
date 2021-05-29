@@ -23,10 +23,6 @@ class BertLSTMClassifier(nn.Module):
         self.bert: BertModel = bert_model
         bert_embedding_size = bert_model.config.hidden_size
 
-        # Freeze BERT
-        for param in self.bert.parameters():
-            param.requires_grad = False
-
         # Bidirectional LSTM Layer
         self.lstm_hidden_size = lstm_hidden_size
         self.lstm = nn.LSTM(
