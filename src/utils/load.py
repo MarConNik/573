@@ -44,4 +44,4 @@ def load_data(data_file, with_labels=True):
     if with_labels:
         return np.array(tweet_ids), np.array(tweets), np.array(tags), np.array(sentiments)
     else:
-        return np.array(tweet_ids), np.array(tags), np.array(tweets)
+        return np.array(tweet_ids), np.array(tweets), np.array(tags)

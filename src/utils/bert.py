@@ -10,6 +10,21 @@ LABEL_INDICES = {
     'neutral': 1,
     'positive': 2
 }
+MAP_TAGS = {
+    'lang1': 0, # English
+    'lang2': 1, # Spanglish
+    'ne': 2, # named entity
+    'ambiguous': 3, # could be Spanish or English
+    'unk': 4, # unknown language
+    'other': 5, # punctuation, emojis
+    'mixed': 6, # both English and Spanish
+    'fw': 7, # foreign word (not English or Spanish)
+    'Eng': 0, # English
+    'O': 5, # punctuation
+    'Hin': 8, # Hindi
+    'EMT': 5 # emojis
+}
+TAG_FEATURES = len(set(MAP_TAGS.values()))
 INDEX_LABELS = {value: key for key, value in LABEL_INDICES.items()}
 DEFAULT_TRAIN_SHARE = 0.90
 MAX_TOKENIZED_TWEET_LENGTH = 140
@@ -21,6 +36,7 @@ def encode_strings(tokens, labels, tags):
     '''
     input_ids = []
     atten_masks = []
+    tag_groups = []
     for i, t in enumerate(tokens):
         #   (1) Tokenize the sentence.
         #   (2) Prepend the `[CLS]` token to the start.
@@ -28,7 +44,7 @@ def encode_strings(tokens, labels, tags):
         #   (4) Map tokens to their IDs.
         #   (5) Pad or truncate the sentence to `max_length`
         #   (6) Create attention masks for [PAD] tokens.
-        processed_tokens = preprocess_tweet(t, tags[i])
+        processed_tokens, processed_tags = preprocess_tweet(t, tags[i])
         encoded_dict = tokenizer.encode_plus(
             processed_tokens,  # Sentence to encode.
             add_special_tokens=True,  # Add '[CLS]' and '[SEP]'
@@ -38,28 +54,34 @@ def encode_strings(tokens, labels, tags):
             return_attention_mask=True,  # Construct attn. masks.
             is_split_into_words=True, # Already split into tokens
             return_tensors='pt', )  # Return pytorch tensors.
-        print(f'Before: {t}')
-        print(f'After: {processed_tokens}')
-
 
         # Add the encoded sentence to the list.
         input_ids.append(encoded_dict['input_ids'])
+        tag_features = np.zeros((MAX_TOKENIZED_TWEET_LENGTH,TAG_FEATURES))
+        for i, group in enumerate(processed_tags):
+            if i == MAX_TOKENIZED_TWEET_LENGTH: break
+            for tag in group:
+                tag_features[i][MAP_TAGS[tag]] += 1
+        tag_groups.append(tag_features)
 
         # And its attention mask (simply differentiates padding from non-padding).
         atten_masks.append(encoded_dict['attention_mask'])
     input_ids = torch.cat(input_ids, dim=0)
     attention_masks = torch.cat(atten_masks, dim=0)
 
+    tag_tensor = torch.tensor(tag_groups)
+
     # Convert label tokens to integers
     all_labels = set(labels)
     label_ints = np.array([LABEL_INDICES[label] for label in labels])
     label_tensor = torch.tensor(label_ints)
-    return input_ids, attention_masks, label_tensor
+
+    return input_ids, attention_masks, label_tensor, tag_tensor
 
 
-def get_dataloaders(input_ids, attention_masks, sentiment_labels, batch_size: int, train_share=DEFAULT_TRAIN_SHARE):
+def get_dataloaders(input_ids, attention_masks, sentiment_labels, tag_sets, batch_size: int, train_share=DEFAULT_TRAIN_SHARE):
     # Split dataset into training and validation subsets
-    dataset = TensorDataset(input_ids, attention_masks, sentiment_labels)
+    dataset = TensorDataset(input_ids, attention_masks, sentiment_labels, tag_sets)
     training_size = int(train_share * len(dataset))
     validation_size = len(dataset) - training_size
     training_dataset, validation_dataset = random_split(dataset, [training_size, validation_size])

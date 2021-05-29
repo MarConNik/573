@@ -15,7 +15,7 @@ def translate_emoji(tok):
 def detokenize_mentions_url(tokens, tags):
     """ Take a list of tokens (in Spanglish or Hinglish format) and tags and
     return a modified list of tokens combining urls and mentions, while regrouping tags
-    (e.g. ["@", "connor", ",", "how", "are", "you", "?"] -> ["@connor" "," ["how"] ["are"] ["you"], ["?"])
+    (e.g. ["@", "connor", ",", "how", "are", "you", "?"] -> ["@connor", ",", "how", "are", "you", "?")
     (tags: ["0", "Eng", "0", "Eng", "Eng", "Eng", "0"] -> [["0", "Eng"], ["0"], ["Eng"], ["Eng"], ["Eng"], ["0"]] )
     """
     tweet = []
@@ -44,6 +44,12 @@ def detokenize_mentions_url(tokens, tags):
             tweet[-1] += token
             grouped_tags[-1].append(tags[i])
         elif token and token[0] == '/':
+            tweet[-1] += token
+            grouped_tags[-1].append(tags[i])
+        elif tweet[-1][0] == '@'  and token.startswith('_') and token.endswith('_'):
+            tweet[-1] += token
+            grouped_tags[-1].append(tags[i])
+        elif tweet[-1][0] == '@' and prev_token.startswith('_') and prev_token.endswith('_'):
             tweet[-1] += token
             grouped_tags[-1].append(tags[i])
         elif prev_token == '@':
@@ -91,4 +97,4 @@ def preprocess_tweet(tweet, tags):
     tokens, tag_groups = detokenize_mentions_url(tweet, tags)
     processed_tokens = [preprocess_token(token) for token in tokens]
     flattened_tokens, tag_groups = flatten_list(processed_tokens, tag_groups)
-    return flattened_tokens
+    return flattened_tokens, tag_groups
