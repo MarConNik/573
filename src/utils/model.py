@@ -8,6 +8,7 @@ from .bert import BERT_MODEL_NAME
 
 MODEL_FILENAME = 'model.pt'
 LSTM_HIDDEN_SIZE = 100
+LSTM_LAYERS = 5
 
 
 class BertLSTMClassifier(nn.Module):
@@ -22,11 +23,16 @@ class BertLSTMClassifier(nn.Module):
         self.bert: BertModel = bert_model
         bert_embedding_size = bert_model.config.hidden_size
 
+        # Freeze BERT
+        for param in self.bert.parameters():
+            param.requires_grad = False
+
         # Bidirectional LSTM Layer
         self.lstm_hidden_size = lstm_hidden_size
         self.lstm = nn.LSTM(
             input_size=bert_embedding_size,
             hidden_size=lstm_hidden_size,
+            num_layers=LSTM_LAYERS,
             batch_first=True,
             bidirectional=True,
         )
