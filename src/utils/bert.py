@@ -59,7 +59,7 @@ def encode_strings(tokens, labels, tags):
         input_ids.append(encoded_dict['input_ids'])
         tag_features = np.zeros((MAX_TOKENIZED_TWEET_LENGTH,TAG_FEATURES))
 
-        for i, tag_index in enumerate(encoded_dict.words(0)):
+        for i, tag_index in enumerate(encoded_dict.word_ids(0)):
             if i == MAX_TOKENIZED_TWEET_LENGTH: break
             if isinstance(tag_index, int):
                 for tag in processed_tags[tag_index]:

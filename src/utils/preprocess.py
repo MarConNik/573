@@ -40,6 +40,9 @@ def detokenize_mentions_url(tokens, tags):
         elif token == 'co' and prev_token == 't':
             tweet[-1] += '.' + token
             grouped_tags[-1].append(tags[i])
+        elif token == '.' and prev_token == 't':
+            tweet[-1] += token
+            grouped_tags[-1].append(tags[i])
         elif prev_prev_token == 'co' and prev_token == '/':
             tweet[-1] += token
             grouped_tags[-1].append(tags[i])
