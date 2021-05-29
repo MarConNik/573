@@ -1,11 +1,12 @@
 import argparse
+import os
 import numpy as np
 import csv
 from utils.load import load_data
 from utils.bert import INDEX_LABELS, encode_strings
 import torch
-from transformers import BertForSequenceClassification
 from torch.utils.data import TensorDataset, DataLoader
+from utils.model import MODEL_FILENAME, BertLSTMClassifier
 
 '''E.g.:
 python src/classify.py --model-directory outputs/SpanglishModel-V0/ --test-file data/Semeval_2020_task9_data/Spanglish/Spanglish_test_conll_unlabeled.txt --output-file Spanglish_predictions.txt
@@ -43,8 +44,14 @@ if __name__ == '__main__':
                         help='training (and validation) batch size')
     args = parser.parse_args()
 
-    # Load the model
-    model = BertForSequenceClassification.from_pretrained(args.model_directory)
+    # Initialize model architecture
+    model = BertLSTMClassifier(num_labels=len(INDEX_LABELS))
+    # Load pre-saved model parameters
+    model_path = os.path.join(args.model_directory, MODEL_FILENAME)
+    model_state_dict = torch.load(model_path)
+    model.load_state_dict(model_state_dict)
+
+    # Set model to evaluate mode
     model.eval()
 
     # Use CUDA if it's available (ie on Google Colab)
@@ -54,6 +61,7 @@ if __name__ == '__main__':
         model.cuda()
     else:
         device = torch.device("cpu")
+        model.to(device)
 
     # Load test data
     X_ids, X = load_data(args.test_file, with_labels=False)
@@ -61,10 +69,6 @@ if __name__ == '__main__':
     dataset = TensorDataset(input_ids, attention_masks)
 
     prediction_dataset = DataLoader(dataset, batch_size = args.batch_size)
-
-    # From D2 classifier
-    # vectorizer, classifier = joblib.load(args.model_file)
-    # z = classifier.predict(vectorizer.transform(X))
 
     predictions = []
     for batch in prediction_dataset:
@@ -75,11 +79,8 @@ if __name__ == '__main__':
         b_input_ids, b_input_mask = batch
 
         # For some reason we have to globally disable gradient accumulation (in addition to setting model to `eval()`)
-        with torch.no_grad(): result = model(b_input_ids,
-                         token_type_ids=None,
-                         attention_mask=b_input_mask,
-                         return_dict=True)
-        batch_logits = result.logits
+        with torch.no_grad():
+            batch_logits = model(b_input_ids, attention_mask=b_input_mask)
         logits = batch_logits.detach().cpu().numpy()
         predictions += [INDEX_LABELS[np.argmax(values)] for values in logits]
 
