@@ -38,7 +38,7 @@ class BertLSTMClassifier(nn.Module):
         self.fc = nn.Linear(2*lstm_hidden_size, len(class_weights))
 
         # Cross entropy loss calculator
-        self.loss = nn.CrossEntropyLoss(weight=class_weights)
+        self.loss = nn.CrossEntropyLoss()
 
     def forward(self, input_ids, attention_mask, labels=None):
         # (Through the magic of tensors, this is all [foreach sequence])
