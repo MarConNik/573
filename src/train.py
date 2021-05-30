@@ -11,7 +11,7 @@ from pandas import DataFrame
 from utils.model import BertLSTMClassifier, MODEL_FILENAME
 from utils.bert import BERT_MODEL_NAME, encode_strings, get_dataloaders
 from utils.load import load_data
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, TensorDataset, RandomSampler, SequentialSampler
 
 
 FINAL = 'FINAL'
@@ -224,7 +224,9 @@ if __name__ == '__main__':
     parser.add_argument('--model-directory', '--model-dir', type=str,
                         help='path to save model to', required=True)
     parser.add_argument('--train-file', type=argparse.FileType('r', encoding='latin-1'),
-                        help='path to unlabelled testing data file', required=True)
+                        help='path to labeled training data file', required=True)
+    parser.add_argument('--dev-file', type=argparse.FileType('r', encoding='latin-1'),
+                        help='path to labeled valdiation data file')
     parser.add_argument('--batch-size', type=int, default=DEFAULT_BATCH_SIZE,
                         help='training (and validation) batch size')
     parser.add_argument('--epochs', '--num-epochs', type=int, default=DEFAULT_NUM_EPOCHS)
@@ -235,16 +237,32 @@ if __name__ == '__main__':
 
     # Get training tweets from file
     tweet_ids, tweets, tags, sentiment_labels = load_data(args.train_file)
-
     # Convert tweets to BERT-readable format
     input_ids, attention_masks, sentiment_labels, tag_sets = encode_strings(tweets, sentiment_labels, tags)
-    training_dataloader, validation_dataloader = get_dataloaders(
-        input_ids=input_ids,
-        attention_masks=attention_masks,
-        sentiment_labels=sentiment_labels,
-        tag_sets=tag_sets,
-        batch_size=args.batch_size
-    )
+
+    if args.dev_file:
+        dev_tweet_ids, dev_tweets, dev_tags, dev_sentiment_labels = load_data(args.dev_file)
+        dev_input_ids, dev_attention_masks, dev_sentiment_labels, dev_tag_sets = encode_strings(dev_tweets, dev_sentiment_labels, dev_tags)
+        training_dataset = TensorDataset(input_ids, attention_masks, sentiment_labels, tag_sets)
+        validation_dataset = TensorDataset(dev_input_ids, dev_attention_masks, dev_sentiment_labels, dev_tag_sets)
+        training_dataloader = DataLoader(
+            training_dataset,
+            sampler=RandomSampler(training_dataset),
+            batch_size=args.batch_size
+        )
+        validation_dataloader = DataLoader(
+            validation_dataset,
+            sampler=SequentialSampler(validation_dataset),
+            batch_size=args.batch_size
+        )
+    else:
+        training_dataloader, validation_dataloader = get_dataloaders(
+            input_ids=input_ids,
+            attention_masks=attention_masks,
+            sentiment_labels=sentiment_labels,
+            tag_sets=tag_sets,
+            batch_size=args.batch_size
+        )
 
     # Count number of unique labels
     # FIXME: figure out a good way to make this no longer necessary
