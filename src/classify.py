@@ -17,7 +17,7 @@ def load_test_data(test_file):
         if line.strip() and line.split()[0] == 'meta' and not tweet:
             tweet_ids.append(line.strip().split('\t')[1])
         elif line.strip():
-            tweet.append(tuple(line.strip().split('\t')))
+            tweet.append(tuple(line.strip('\n').split('\t')))
         elif tweet:
             tweets.append(tuple(tweet))
             tweet = []
