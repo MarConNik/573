@@ -38,6 +38,7 @@ class BertLSTMClassifier(nn.Module):
         )
 
         # Final feed-forward linear layer for classification
+        self.dropout = nn.Dropout(p=LSTM_DROPOUT)
         self.fc = nn.Linear(2*lstm_hidden_size, num_labels)
 
         # Cross entropy loss calculator
