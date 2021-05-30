@@ -27,14 +27,16 @@ def output_predictions(X_ids, z, output_file,lince):
                 guess = z[i].replace('\n','').replace('\r','')
                 outputs.append(guess)
             lince_f.write('\n'.join(outputs))
+    else:
+        
             
-    with open(filename, 'w', newline='', encoding='utf-8') as f:       
-        writer = csv.writer(f)
-        writer.writerow(['Uid', 'Sentiment'])
-        for i in range(len(X_ids)):
-            X_id = X_ids[i].replace('\n','').replace('\r','')
-            guess = z[i].replace('\n','').replace('\r','')
-            writer.writerow([X_id, guess])
+        with open(filename, 'w', newline='', encoding='utf-8') as f:       
+            writer = csv.writer(f)
+            writer.writerow(['Uid', 'Sentiment'])
+            for i in range(len(X_ids)):
+                X_id = X_ids[i].replace('\n','').replace('\r','')
+                guess = z[i].replace('\n','').replace('\r','')
+                writer.writerow([X_id, guess])
 
 
 if __name__ == '__main__':
