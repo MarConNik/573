@@ -68,7 +68,7 @@ class BertLSTMClassifier(nn.Module):
 
         # Concatenate the two last LSTM hidden states, pass to feed-forward
         sequence_vector = torch.cat((forward_out, reverse_out), dim=-1)
-        logits = self.fc(sequence_vector)
+        logits = self.fc(self.dropout(sequence_vector))
 
         if labels is None:
             return logits
