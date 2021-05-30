@@ -9,6 +9,7 @@ from .bert import BERT_MODEL_NAME, TAG_FEATURES
 MODEL_FILENAME = 'model.pt'
 LSTM_HIDDEN_SIZE = 100
 LSTM_LAYERS = 5
+LSTM_DROPOUT = 0.75
 
 
 class BertLSTMClassifier(nn.Module):
@@ -19,7 +20,9 @@ class BertLSTMClassifier(nn.Module):
 
         # BERT Layer, for Contextual Embeddings
         if bert_model is None:
-            bert_model = BertModel.from_pretrained(BERT_MODEL_NAME)
+            bert_model = BertModel.from_pretrained(
+                BERT_MODEL_NAME, hidden_dropout_prob=0.1,
+                attention_probs_dropout_prob=0.1)
         self.bert: BertModel = bert_model
         bert_embedding_size = bert_model.config.hidden_size
 
@@ -29,11 +32,13 @@ class BertLSTMClassifier(nn.Module):
             input_size=(bert_embedding_size+TAG_FEATURES),
             hidden_size=lstm_hidden_size,
             num_layers=LSTM_LAYERS,
+            dropout=LSTM_DROPOUT,
             batch_first=True,
             bidirectional=True,
         )
 
         # Final feed-forward linear layer for classification
+        self.dropout = nn.Dropout(p=LSTM_DROPOUT)
         self.fc = nn.Linear(2*lstm_hidden_size, num_labels)
 
         # Cross entropy loss calculator
@@ -63,7 +68,7 @@ class BertLSTMClassifier(nn.Module):
 
         # Concatenate the two last LSTM hidden states, pass to feed-forward
         sequence_vector = torch.cat((forward_out, reverse_out), dim=-1)
-        logits = self.fc(sequence_vector)
+        logits = self.fc(self.dropout(sequence_vector))
 
         if labels is None:
             return logits
