@@ -16,17 +16,27 @@ python src/classify.py --model-directory outputs/SpanglishModel-V0/ --test-file 
 DEFAULT_BATCH_SIZE = 32
 
 
-def output_predictions(X_ids, z, output_file):
+def output_predictions(X_ids, z, output_file,lince):
     """ Takes a list of ids along with classified sentiments and writes to provided output filename.
     """
     filename = output_file.name
-    with open(filename, 'w', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f)
-        writer.writerow(['Uid', 'Sentiment'])
-        for i in range(len(X_ids)):
-            X_id = X_ids[i].replace('\n','').replace('\r','')
-            guess = z[i].replace('\n','').replace('\r','')
-            writer.writerow([X_id, guess])
+    if lince == 1:
+        with open(filename, 'w', encoding='utf-8') as lince_f:
+            outputs = []
+            for i in range(len(z)):
+                guess = z[i].replace('\n','').replace('\r','')
+                outputs.append(guess)
+            lince_f.write('\n'.join(outputs))
+    else:
+        
+            
+        with open(filename, 'w', newline='', encoding='utf-8') as f:       
+            writer = csv.writer(f)
+            writer.writerow(['Uid', 'Sentiment'])
+            for i in range(len(X_ids)):
+                X_id = X_ids[i].replace('\n','').replace('\r','')
+                guess = z[i].replace('\n','').replace('\r','')
+                writer.writerow([X_id, guess])
 
 
 if __name__ == '__main__':
@@ -42,8 +52,11 @@ if __name__ == '__main__':
     parser.add_argument('--batch-size', type=int,
                         default=DEFAULT_BATCH_SIZE,
                         help='training (and validation) batch size')
+    parser.add_argument('--lince-output', type=int,
+                    default=0,
+                    help='create output following LINCE submission guidelines\n0 = no output created, 1 = output created')
     args = parser.parse_args()
-
+    
     # Initialize model architecture
     model = BertLSTMClassifier(num_labels=len(INDEX_LABELS))
     # Load pre-saved model parameters
@@ -83,5 +96,8 @@ if __name__ == '__main__':
             batch_logits = model(b_input_ids, attention_mask=b_input_mask, tags=b_tag_set)
         logits = batch_logits.detach().cpu().numpy()
         predictions += [INDEX_LABELS[np.argmax(values)] for values in logits]
-
-    output_predictions(X_ids, predictions, args.output_file)
+        
+    # lince = 1, LINCE submission file created
+    # lince = 0, LINCE submission file not created
+    lince = args.lince_output
+    output_predictions(X_ids, predictions, args.output_file, lince)
