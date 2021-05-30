@@ -21,13 +21,26 @@ def load_data(data_file, with_labels=True):
     tweet = []
     tweet_tags = []
     for line in data_file:
-        if line.strip() and line.split()[0] == 'meta' and len(tweet) == 0:
+        
+        if line.strip() and line.startswith('# sent_enum = ') and len(tweet) == 0:
+            if with_labels:
+                id_sentiment = line.split('# sent_enum = ')[1]
+                tweet_id = id_sentiment.split()[0]
+                sentiment = id_sentiment.split()[1]
+                sentiments.append(sentiment)
+            else:
+                _, tweet_id = line.strip().split('\t')[:2]
+            tweet_ids.append(tweet_id)
+        
+        elif line.strip() and line.split()[0] == 'meta' and len(tweet) == 0:
             if with_labels:
                 _, tweet_id, sentiment = line.strip().split('\t')
                 sentiments.append(sentiment)
             else:
                 _, tweet_id = line.strip().split('\t')[:2]
             tweet_ids.append(tweet_id)
+            
+            
         elif line.strip():
             if len(line.strip().split('\t')) == 2:
                 token, lang = tuple(line.strip().split('\t'))
@@ -41,6 +54,7 @@ def load_data(data_file, with_labels=True):
     if tweet:
         tweets.append(tweet)
         tags.append(tweet_tags)
+        
     if with_labels:
         return np.array(tweet_ids), np.array(tweets), np.array(tags), np.array(sentiments)
     else:
