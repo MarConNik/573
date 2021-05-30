@@ -33,7 +33,7 @@ def load_train_data(training_file):
             tweet_ids.append(tweet_id)
             sentiments.append(sentiment)
         elif line.strip():
-            token, lang = tuple(line.strip().split('\t'))
+            token, lang = tuple(line.strip('\n').split('\t'))
             tweet.append((token, lang))
         elif tweet:
             tweets.append(tuple(tweet))
