@@ -22,7 +22,7 @@ class BertLSTMClassifier(nn.Module):
         if bert_model is None:
             bert_model = BertModel.from_pretrained(
                 BERT_MODEL_NAME, hidden_dropout_prob=0.5,
-                attention_dropout_prob=0.5)
+                attention_probs_dropout_prob=0.5)
         self.bert: BertModel = bert_model
         bert_embedding_size = bert_model.config.hidden_size
 
