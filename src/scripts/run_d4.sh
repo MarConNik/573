@@ -20,3 +20,20 @@ HINGLISH_GOLD_STANDARD="data/Semeval_2020_task9_data/Hinglish/Hinglish_test_labe
 TRAIN_FILE="$HINGLISH_TRAIN_FILE" TEST_FILE="$HINGLISH_DEV_FILE" GOLD_STANDARD="$HINGLISH_GOLD_STANDARD" \
 MODEL_DIR="$HINGLISH_MODEL_DIR" LANG_PAIR="hinglish" OUTPUTS_DIR="$HINGLISH_OUTPUTS_DIR" RESULTS_DIR="$HINGLISH_RESULTS_DIR" \
  src/scripts/run_dev.sh
+
+# Make output & results directories
+SPANGLISH_OUTPUTS_DIR="outputs/D4/primary"
+mkdir -p "$SPANGLISH_OUTPUTS_DIR"
+SPANGLISH_RESULTS_DIR="results/D4/primary"
+mkdir -p "$SPANGLISH_RESULTS_DIR"
+
+# Spanglish settings
+SPANGLISH_TRAIN_FILE="data/Semeval_2020_task9_data/Spanglish/Spanglish_train.conll"
+SPANGLISH_DEV_FILE="data/Semeval_2020_task9_data/Spanglish/Spanglish_dev.conll"
+SPANGLISH_TEST_FILE="data/Semeval_2020_task9_data/Spanglish/Spanglish_test_conll_unlabeled.txt"
+SPANGLISH_GOLD_STANDARD="data/Semeval_2020_task9_data/Spanglish/Spanglish_test_labels.txt"
+
+# Train, run, and evaluate Spanglish model on dev
+TRAIN_FILE="$SPANGLISH_TRAIN_FILE" TEST_FILE="$SPANGLISH_DEV_FILE" GOLD_STANDARD="$SPANGLISH_GOLD_STANDARD" \
+MODEL_DIR="$SPANGLISH_MODEL_DIR" LANG_PAIR="spanglish" OUTPUTS_DIR="$SPANGLISH_OUTPUTS_DIR" RESULTS_DIR="$SPANGLISH_RESULTS_DIR" \
+ src/scripts/run_dev.sh
