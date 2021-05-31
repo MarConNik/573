@@ -22,15 +22,33 @@ the same model file on our shared Google Drive.
 
 ## Training
 
-You can train a model (and vectorizer) using the following command (after activating the [correct
-environment](#environment)):
+### Using Development Set
+
+You can train a model using the following command (after activating the [correct environment](#environment)):
 
 ```shell
 $ python src/train.py --train-file <TRAIN_FILE> --model-directory <MODEL_DIRECTORY>
 ```
 
-replacing `<TRAIN_FILE>` with the path to training data and `<MODEL_DIRECTORY>`
-with a path to save the model.
+replacing `<TRAIN_FILE>` with the path to the training data and `<MODEL_DIRECTORY>` with the path to where the model
+checkpoints will be saved.
+
+The above command will train using the default hyperparameters for our training loop. It will also use a random 10% of
+the training data in `<TRAIN_FILE>` file as a per-epoch validation dataset.
+
+### Using Final Test Set
+
+You can train a model using the following command (after activating the [correct environment](#environment)):
+
+```shell
+$ python src/train.py --train-file <TRAIN_FILE> --dev-file <DEV_FILE> --model-directory <MODEL_DIRECTORY>
+```
+
+replacing `<TRAIN_FILE>` with the path to the training data, `<DEV_FILE>` with the path to the dev dataset file, and
+`<MODEL_DIRECTORY>` with the path to where the model checkpoints will be saved.
+
+The above command will train using the default hyperparameters for our training loop. It will also use `<DEV_FILE>` as a
+per-epoch validation dataset.
 
 ## Data
 
@@ -49,13 +67,13 @@ Hinglish_test_unlabeled_conll_updated.txt: 77
 The classifier can be run from the shell with the following command:
 
 ```shell
-$ python src/classify.py --test-file <TEST_FILE> --model-file <MODEL_FILE> --output-file <OUTPUT_FILE>
+$ python src/classify.py --test-file <TEST_FILE> --model-directory <MODEL_DIRECTORY>/<MODEL_INSTANCE> --output-file <OUTPUT_FILE>
 ```
 
 replacing `<TEST_FILE>` with the path to a testing data file (
 e.g. `data/Semeval_2020_task9_data/Spanglish/Spanglish_test_conll_unlabeled.txt`)
 and `<OUTPUT_FILE>` with the path to an output file (e.g. `output.txt`) and
-`<MODEL_FILE>` with the path to a saved model file.
+`<MODEL_FILE>` with the path to a saved model file (NOTE: the `<MODEL_FILE>`).
 
 ## Environment
 
