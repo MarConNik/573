@@ -1,0 +1,2 @@
+outputs/Spanglish-ModelV2/pytorch_model.bin filter=lfs diff=lfs merge=lfs -text
+outputs/D3/Spanglish-ModelV3.2/pytorch_model.bin filter=lfs diff=lfs merge=lfs -text
