@@ -1,0 +1,20 @@
+# ouput file from https://ritual.uh.edu/lince/ submission website
+F1-Score: 48.490
+
+SPA-ENG SA - negative
+precision	38.26
+recall	47.84
+f1-score	42.52
+support	763.00
+
+SPA-ENG SA - neutral
+precision	10.00
+recall	0.08
+f1-score	0.15
+support	1294.00
+
+SPA-ENG SA - positive
+precision	62.88
+recall	88.54
+f1-score	73.54
+support	2679.00
