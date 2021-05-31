@@ -25,7 +25,7 @@ python src/train.py --train-file data/Semeval_2020_task9_data/SpanglishMini/trai
 # Default training hyperparameters
 DEFAULT_LEARNING_RATE = 2e-5
 DEFAULT_EPSILON = 1e-8
-DEFAULT_NUM_EPOCHS = 4
+DEFAULT_NUM_EPOCHS = 5
 
 DEFAULT_SEED = 634  # Generated pseudorandomly (out of 1000)
 DEFAULT_BATCH_SIZE = 32
