@@ -17,6 +17,6 @@ python src/classify.py --model-directory "${MODEL_DIR}/FINAL" --test-file "$TEST
 if [[ "$LANG_PAIR" == "hinglish" ]]
 then
   echo "evaluating..."
-  python src/evaluate.py --train-file "$GOLD_STANDARD" "$OUTPUT_FILE" > "$EVAL_FILE"
+  python src/evaluate.py "$GOLD_STANDARD" "$OUTPUT_FILE" > "$EVAL_FILE"
 fi
 echo "complete!"
