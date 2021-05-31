@@ -3,6 +3,8 @@ Collaborators: Connor Boyle, Martin Horst, Nikitas Tampakis
 
 The [shared document report](https://www.overleaf.com/project/60666a8f489d2af234461f37) is hosted on Overleaf.
 
+This code can be run most conveniently through our [Google Colab notebook](https://colab.research.google.com/drive/1Eg4e6SH6St-yCNQBHFqSjk5rKdCs841o?usp=sharing).
+
 ### NOTE: Cached Models (D3)
 
 The cached Spanglish model for D3 is committed to this repository. It requires `git-lfs` to download the actual file; by
