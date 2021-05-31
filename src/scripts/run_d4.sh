@@ -14,16 +14,17 @@ mkdir -p "$HINGLISH_RESULTS_DIR"
 HINGLISH_TRAIN_FILE="data/Semeval_2020_task9_data/Hinglish/Hinglish_train_14k_split_conll.txt"
 HINGLISH_DEV_FILE="data/Semeval_2020_task9_data/Hinglish/Hinglish_dev_3k_split_conll.txt"
 HINGLISH_TEST_FILE="data/Semeval_2020_task9_data/Hinglish/Hinglish_test_unlabeled_conll_updated.txt"
-HINGLISH_GOLD_STANDARD="data/Semeval_2020_task9_data/Hinglish/Hinglish_test_labels.txt"
+HINGLISH_DEV_GOLD_STANDARD="data/Semeval_2020_task9_data/Hinglish/Hinglish_dev_labels.txt"
+HINGLISH_EVAL_GOLD_STANDARD="data/Semeval_2020_task9_data/Hinglish/Hinglish_test_labels.txt"
 
 # Train, run, and evaluate Hinglish model on dev
-TRAIN_FILE="$HINGLISH_TRAIN_FILE" TEST_FILE="$HINGLISH_DEV_FILE" GOLD_STANDARD="$HINGLISH_GOLD_STANDARD" \
+TRAIN_FILE="$HINGLISH_TRAIN_FILE" TEST_FILE="$HINGLISH_DEV_FILE" GOLD_STANDARD="$HINGLISH_DEV_GOLD_STANDARD" \
 MODEL_DIR="$HINGLISH_MODEL_DIR" LANG_PAIR="hinglish" OUTPUTS_DIR="$HINGLISH_OUTPUTS_DIR" RESULTS_DIR="$HINGLISH_RESULTS_DIR" \
  src/scripts/run_dev.sh
 
 # Train, run, and evaluate Hinglish model on eval
 TRAIN_FILE="$HINGLISH_TRAIN_FILE" DEV_FILE="$HINGLISH_DEV_FILE" TEST_FILE="$HINGLISH_TEST_FILE" \
-GOLD_STANDARD="$HINGLISH_GOLD_STANDARD" MODEL_DIR="$HINGLISH_MODEL_DIR" LANG_PAIR="hinglish" \
+GOLD_STANDARD="$HINGLISH_EVAL_GOLD_STANDARD" MODEL_DIR="$HINGLISH_MODEL_DIR" LANG_PAIR="hinglish" \
 OUTPUTS_DIR="$HINGLISH_OUTPUTS_DIR" RESULTS_DIR="$HINGLISH_RESULTS_DIR" src/scripts/run_dev.sh
 
 # Make output & results directories
@@ -45,5 +46,5 @@ MODEL_DIR="$SPANGLISH_MODEL_DIR" LANG_PAIR="spanglish" OUTPUTS_DIR="$SPANGLISH_O
 
 # Train, run, and evaluate Spanglish model on eval
 TRAIN_FILE="$SPANGLISH_TRAIN_FILE" DEV_FILE="$SPANGLISH_DEV_FILE" TEST_FILE="$SPANGLISH_TEST_FILE" \
-GOLD_STANDARD="$SPANGLISH_GOLD_STANDARD" MODEL_DIR="$SPANGLISH_MODEL_DIR" LANG_PAIR="spanglish" \
-OUTPUTS_DIR="$SPANGLISH_OUTPUTS_DIR" RESULTS_DIR="$SPANGLISH_RESULTS_DIR" src/scripts/run_dev.sh
+MODEL_DIR="$SPANGLISH_MODEL_DIR" LANG_PAIR="spanglish" OUTPUTS_DIR="$SPANGLISH_OUTPUTS_DIR" \
+RESULTS_DIR="$SPANGLISH_RESULTS_DIR" src/scripts/run_dev.sh
