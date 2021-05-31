@@ -1,6 +1,11 @@
-MODEL_DIR="$OUTPUTS_DIR/${LANG_PAIR}-eval-model"
-OUTPUT_FILE="$OUTPUTS_DIR/${LANG_PAIR}-eval.results"
-EVAL_FILE="$RESULTS_DIR/${LANG_PAIR}-eval.txt"
+EVAL_OUTPUTS_DIR="$OUTPUTS_DIR/evaltest"
+mkdir -p $EVAL_OUTPUTS_DIR
+EVAL_RESULTS_DIR="$RESULTS_DIR/evaltest"
+mkdir -p $EVAL_RESULTS_DIR
+
+MODEL_DIR="$EVAL_OUTPUTS_DIR/${LANG_PAIR}-eval-model"
+OUTPUT_FILE="$EVAL_OUTPUTS_DIR/${LANG_PAIR}-eval.results"
+EVAL_FILE="$EVAL_RESULTS_DIR/D4_scores.out"
 
 echo "Running eval for ${LANG_PAIR}"
 
