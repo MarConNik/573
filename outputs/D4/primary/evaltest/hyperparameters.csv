@@ -2,11 +2,11 @@ Hyperparameter,Value
 Epsilon,1e-08
 Epochs,5
 Learning Rate,2e-05
-Random Seed,129
+Random Seed,122
 Training Batch Size,32
-Training Batch Count,438
+Training Batch Count,382
 Validation Batch Size,32
-Validation Batch Count,94
+Validation Batch Count,59
 Optimizer,AdamW
 Training Device,cuda
 Pre-trained Model,bert-base-multilingual-cased
