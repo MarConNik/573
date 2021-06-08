@@ -1,0 +1,13 @@
+Weighted F1 score: 0.4815032327947979
+Positive: Precision=0.5767276422764228 Recall=0.7576769025367156 F1=0.6549336410848241
+Neutral: Precision=0.379182156133829 Recall=0.2052313883299799 F1=0.26631853785900783
+Negative: Precision=0.39634146341463417 Recall=0.38537549407114624 F1=0.39078156312625256
+
+Confusion matrix for the output data:
+row is the truth, column is the system output
+       positive neutral  negative
+positive  1135     210      153
+neutral   646      204      144
+negative  187      124      195
+
+Raw accuracy: 0.5116744496330887
