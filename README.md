@@ -1,26 +1,13 @@
 # 573 Group Project
 Collaborators: Connor Boyle, Martin Horst, Nikitas Tampakis
 
-The [shared document report](https://www.overleaf.com/project/60666a8f489d2af234461f37) is hosted on Overleaf.
 
 This code can be run most conveniently through our [Google Colab notebook](https://colab.research.google.com/drive/1Eg4e6SH6St-yCNQBHFqSjk5rKdCs841o?usp=sharing).
 
 ### NOTE: Cached Models
 
-The cached models for D4 are committed to this repository. They require `git-lfs` to download the actual file; by
-default, cloning this repository will only download a metadata file of the PyTorch model
-file (`outputs/D3/Spanglish-ModelV3.2/pytorch_model.bin`) to your local environment. `git-lfs` is included
-in the conda environment. To activate LFS and download the cached model run the following commands:
-```
-git lfs install
-git lfs fetch
-git lfs pull
-```
-
-If you can't get `git-lfs` to
-download the full 700+ MB trained models, you can
-use [this link](https://drive.google.com/drive/folders/1YQD_TNBHXNCf4sZT--a5eN3QG0lLOjql?usp=sharing) to reach a copy of
-the same model files on our shared Google Drive.
+The cached models for D4 will remain available for a short period on the UW Google Drive. To download the full 700+ MB trained
+models, you can use [this link](https://drive.google.com/drive/folders/1YQD_TNBHXNCf4sZT--a5eN3QG0lLOjql?usp=sharing).
 
 ## Training
 
